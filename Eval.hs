@@ -1,7 +1,7 @@
 module Eval where
 
 import DEFS
-import Functions
+import FunctionsTest
 import Control.Applicative (Applicative(..))
 import Control.Monad       (liftM, ap)
 import System.IO
@@ -27,14 +27,32 @@ instance Applicative RandomState where
     (<*>)  = ap      
 
 class Monad m => MonadState m where
-    getStd :: StdGen -> m StdGen
+    getStd :: m StdGen
     
 instance MonadState RandomState where
-    getStd sg = RS (\sg -> let (sg1,sg2) = split sg in
+    getStd = RS (\sg -> let (sg1,sg2) = split sg in
                            (sg1,sg2))
 
 
--- ~ main = do
-    -- ~ g <- newStdGen
+eval :: StdGen -> DiceRoll -> ([Int],StdGen)
+eval g dice = runRS (do {d1 <- evaldice dice ; d2 <- evaldice dice; return (d1 @@ d2)}) g 
+
+evaldice :: (MonadState m) => DiceRoll -> m [Int]
+evaldice (D k n) = do
+    g' <- getStd
+    let rolls = take k (randomRs (1 :: Int,n) g')
+    return rolls
+evaldice (Z k n) = do
+    g' <- getStd
+    let rolls = take k (randomRs (0 :: Int,n) g')
+    return rolls
     
 
+
+-- ~ diceroll :: StdGen -> Dice -> [Int]
+-- ~ diceroll g (D k n) = take k (randomRs (0 :: Int,n) g)
+
+mainEval = do  
+    g <- newStdGen
+    let res = eval g (D 4 6)
+    print res
