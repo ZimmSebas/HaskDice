@@ -22,3 +22,10 @@ A DSL of dice rolls made in Haskell
 - Language in general
 
 This DSL, was made as my final proyect for the Programming language analysis subject
+
+## License
+
+GNU General Public License v3.0
+
+
+Made by @ZimmSebas, with love <3
