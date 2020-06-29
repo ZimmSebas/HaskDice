@@ -8,9 +8,13 @@ A DSL of dice rolls made in Haskell
 ### To Do
 
 - Command structures
-- Lists vs Multisets
 - Remodel definitions
+- Decide if IfThenElse checks for empty Collection or checks a boolean operator
+- Lists vs Multisets
 - Extend Eval
+- Add a monad that keeps the state of variables
+- Add most of the commands
+- Extend Eval (again)
 - Parser
 - Language in general
 

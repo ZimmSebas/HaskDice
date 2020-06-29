@@ -35,22 +35,18 @@ instance MonadState RandomState where
 
 
 eval :: StdGen -> DiceRoll -> ([Int],StdGen)
-eval g dice = runRS (do {d1 <- evaldice dice ; d2 <- evaldice dice; return (d1 @@ d2)}) g 
+eval g dice = runRS (do {d1 <- evalRoll dice ; d2 <- evalRoll dice; return (d1 @@ d2)}) g 
 
-evaldice :: (MonadState m) => DiceRoll -> m [Int]
-evaldice (D k n) = do
+evalRoll :: (MonadState m) => Rolls -> m [Int]
+evalRoll (D k n) = do
     g' <- getStd
     let rolls = take k (randomRs (1 :: Int,n) g')
     return rolls
-evaldice (Z k n) = do
+evalRoll (Z k n) = do
     g' <- getStd
     let rolls = take k (randomRs (0 :: Int,n) g')
     return rolls
-    
-
-
--- ~ diceroll :: StdGen -> Dice -> [Int]
--- ~ diceroll g (D k n) = take k (randomRs (0 :: Int,n) g)
+evalRoll (C l) = return l
 
 mainEval = do  
     g <- newStdGen

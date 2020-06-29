@@ -11,10 +11,10 @@ import Prelude
 -- ~ randomList seed = randoms (mkStdGen seed) :: [Double]
 
 -- Given a seed, generates 1 dice roll of n sides
-diceroll :: StdGen -> DiceRoll -> [Int]
+diceroll :: StdGen -> Rolls -> [Int]
 diceroll g (D k n) = take k (randomRs (0 :: Int,n) g)
 
-diceRoll :: DiceRoll -> IO [Int]
+diceRoll :: Rolls -> IO [Int]
 diceRoll (D k n) = do
     g <- newStdGen
     let rolls = take k (randomRs (0::Int,n) g)
