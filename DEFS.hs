@@ -18,26 +18,39 @@ type Collection = [Int]
 data Rolls = D Int Int
            | Z Int Int
            | C Collection
+ deriving Show
+
+data FilOp = Gt Int 
+           | Lt Int 
+           | GEt Int 
+           | LEt Int
+           | Eq Int 
+           | NEq Int 
+ deriving Show
+
 
 -- Operadores de colecciones que generan colecciones
-data Coll = Roll Rolls
-            | MAX Rolls
-            | MIN Rolls
-            | Least Int Rolls
-            | Largt Int Rolls
-            | Filter (Int -> Bool) Rolls
-            | Concat Rolls Rolls
+data CollExp = Roll Rolls
+             | Least Int CollExp
+             | Largt Int CollExp
+             | Filter FilOp CollExp -- Filter can be a problem, because is not a "bool"
+             | Concat CollExp CollExp
+ deriving Show
 
 -- Expresiones sobre colecciones que generan enteros, o enteros
 data NumExp = CONST Int
-            | COLL Coll
-            | SUM Coll
-            | COUNT Coll
+            | MAX CollExp
+            | MIN CollExp
+            | COLL CollExp
+            | SUM CollExp
+            | COUNT CollExp
+ deriving Show
 
 -- Commands
 data Command = Skip
              | Seq Command Command
              | Indep NumExp NumExp
+ deriving Show
              -- ~ | IfThenElse Coll Command Command
              -- ~ | REPUNT Command Command
              -- ~ | ACC Command Command 

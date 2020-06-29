@@ -1,9 +1,10 @@
 module Eval where
 
 import DEFS
-import FunctionsTest
+import Functions
 import Control.Applicative (Applicative(..))
 import Control.Monad       (liftM, ap)
+import Data.List
 import System.IO
 import System.Random 
 import Prelude
@@ -34,10 +35,13 @@ instance MonadState RandomState where
                            (sg1,sg2))
 
 
-eval :: StdGen -> DiceRoll -> ([Int],StdGen)
-eval g dice = runRS (do {d1 <- evalRoll dice ; d2 <- evalRoll dice; return (d1 @@ d2)}) g 
+eval :: StdGen -> CollExp -> ([Int],StdGen)
+eval g exp = runRS (do {res <- evalColl exp; return res}) g 
 
-evalRoll :: (MonadState m) => Rolls -> m [Int]
+
+-- evalRoll takes a Roll and generates a list of dice rolls (Ints), by using pseudo-random number generators.
+-- alternative, if it gets a Collection already evaluated, it just returns the collection.
+evalRoll :: (MonadState m) => Rolls -> m Collection
 evalRoll (D k n) = do
     g' <- getStd
     let rolls = take k (randomRs (1 :: Int,n) g')
@@ -48,7 +52,40 @@ evalRoll (Z k n) = do
     return rolls
 evalRoll (C l) = return l
 
+-- EvalFiltOp evalua un operador posible para filter y lo devuelve en forma de función
+evalFiltOp :: FilOp -> (Int -> Bool)
+evalFiltOp (Gt n)  = (>n)
+evalFiltOp (Lt n)  = (<n)
+evalFiltOp (GEt n) = (>=n)
+evalFiltOp (LEt n) = (<=n)
+evalFiltOp (Eq n)  = (==n)
+evalFiltOp (NEq n) = (/=n)
+
+
+-- evalColl toma una expresión de colección y devuelve la evaluación de este.
+evalColl :: (MonadState m) => CollExp -> m Collection
+evalColl (Roll r) = do
+            rolls <- evalRoll r 
+            return rolls
+evalColl (Least k ce) = do
+            rolls <- evalColl ce
+            let rolls' = take k (sort rolls)
+            return rolls'
+evalColl (Largt k ce) = do
+            rolls <- evalColl ce
+            let rolls' = take k (sortBy (flip compare) rolls)
+            return rolls'
+evalColl (Filter fop ce) = do
+            rolls <- evalColl ce
+            let funcfilt = evalFiltOp fop
+            return (filter funcfilt rolls)
+evalColl (Concat exp1 exp2) = do
+            c1 <- evalColl exp1
+            c2 <- evalColl exp2
+            return (c1 @@ c2)
+            
+            
 mainEval = do  
     g <- newStdGen
-    let res = eval g (D 4 6)
+    let res = eval g (Filter (Lt 3) (Largt 3 (Roll (D 10 3))))
     print res
