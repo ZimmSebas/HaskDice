@@ -14,8 +14,9 @@ A DSL of dice rolls made in Haskell
 - ~Remodel definitions~
 - Decide if IfThenElse checks for empty Collection or checks a boolean operator
 - Lists vs Multisets
-- Extend Eval
+- Decide the return value of eval Command
 - Add a monad that keeps the state of variables
+- Extend Eval
 - Add most of the commands
 - Extend Eval (again)
 - Parser

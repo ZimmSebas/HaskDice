@@ -52,7 +52,7 @@ evalRoll (Z k n) = do
     return rolls
 evalRoll (C l) = return l
 
--- EvalFiltOp evalua un operador posible para filter y lo devuelve en forma de función
+-- evalFiltOp evalua un operador posible para filter y lo devuelve en forma de función
 evalFiltOp :: FilOp -> (Int -> Bool)
 evalFiltOp (Gt n)  = (>n)
 evalFiltOp (Lt n)  = (<n)
@@ -83,9 +83,30 @@ evalColl (Concat exp1 exp2) = do
             c1 <- evalColl exp1
             c2 <- evalColl exp2
             return (c1 @@ c2)
-            
-            
+
+
+
+-- evalNumExp evalua una expresión de colección que devuelve un entero
+evalNumExp :: (MonadState m) => NumExp -> m Int
+evalNumExp (CONST n) = return n
+evalNumExp (MAX ce) = do
+            rolls <- evalColl ce
+            return (foldr max 0 rolls)
+evalNumExp (MIN ce) = do
+            rolls <- evalColl ce
+            return (foldr min (minBound::Int) rolls)
+evalNumExp (SUM ce) = do
+            rolls <- evalColl ce
+            return (sum rolls)
+evalNumExp (COUNT ce) = do
+            rolls <- evalColl ce
+            return (length rolls)
+
+
+-- eval Command se va a enfrentar al tema de que necesitaría que pueda retornar algo decente.
+
+
 mainEval = do  
     g <- newStdGen
-    let res = eval g (Filter (Lt 3) (Largt 3 (Roll (D 10 3))))
+    let res = fst $ eval g (Filter (GEt 5) (Largt 3 (Roll (D 4 6))))
     print res
