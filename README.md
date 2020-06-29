@@ -4,11 +4,14 @@ A DSL of dice rolls made in Haskell
 
 -- Work in progress --
 
+## Prerequisites
+
+- Haskell
 
 ### To Do
 
-- Command structures
-- Remodel definitions
+- ~~Command structures
+- ~~Remodel definitions
 - Decide if IfThenElse checks for empty Collection or checks a boolean operator
 - Lists vs Multisets
 - Extend Eval
