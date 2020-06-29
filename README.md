@@ -27,5 +27,6 @@ This DSL, was made as my final proyect for the Programming language analysis sub
 
 GNU General Public License v3.0
 
+## Contributors
 
 Made by @ZimmSebas, with love <3
