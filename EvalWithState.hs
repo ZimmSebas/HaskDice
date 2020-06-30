@@ -10,12 +10,22 @@ import System.Random
 import Prelude
 
 
--- Estados
+---------------------------------------
+----- Initial values and types --------
+---------------------------------------
+
+
+-- Variable State
 type Env = [(Variable,Value)]
 
--- Estado nulo
+-- Initial State (Null)
 initState :: Env
 initState = []
+
+
+---------------------------------------
+----- Monads --------------------------
+---------------------------------------
 
 newtype RandomState a = RS { runRS :: Env -> StdGen -> Maybe (a, Env, StdGen) }
 
@@ -73,12 +83,17 @@ instance MonadRandom RandomState where
                            Just (sg1,st,sg2))
 
 
+---------------------------------------
+----- Evaluator -----------------------
+---------------------------------------
+
+
 -- ~ -- eval is the first function to be called, to eval the result that the main call upon.
 
 -- ~ eval :: StdGen -> CollExp -> Maybe (Value,Env)
 -- ~ eval gen exp = case (runRS (do {res <- evalColl exp; return res}) initState gen) of
     -- ~ Nothing            -> Nothing
-    -- ~ Just (val, st, sg) -> Just (Right val,st)
+    -- ~ Just (val, st, sg) -> Just (val,st)
 
 
 -- evalRoll takes a Roll and generates a list of dice rolls (Ints), by using pseudo-random number generators.
@@ -142,7 +157,7 @@ evalNumExp (COUNT ce) = do
             rolls <- evalCollExp ce
             return $ length rolls
 
--- eval Command se va a enfrentar al tema de que necesitaría que pueda retornar algo decente.
+-- eval Command takes a command and evaluates the changes in the state.
 
 
 -- ~ mainEval = do  
