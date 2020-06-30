@@ -105,47 +105,44 @@ evalFiltOp (NEq n) = (/=n)
 
 
 -- ~ -- evalColl takes any kind of collection expresion and returns a collection
-evalColl :: (MonadState m, MonadError m, MonadRandom m) => CollExp -> m Collection
-evalColl (Roll r) = do
-            rolls <- evalRoll r 
-            return rolls
-evalColl (Least k ce) = do
-            rolls <- evalColl ce
-            let rolls' = take k (sort rolls)
-            return rolls'
-evalColl (Largt k ce) = do
-            rolls <- evalColl ce
-            let rolls' = take k (sortBy (flip compare) rolls)
-            return rolls'
-evalColl (Filter fop ce) = do
-            rolls <- evalColl ce
-            let funcfilt = evalFiltOp fop
-            return (filter funcfilt rolls)
-evalColl (Concat exp1 exp2) = do
-            c1 <- evalColl exp1
-            c2 <- evalColl exp2
-            return (c1 @@ c2)
-
-
+evalCollExp :: (MonadState m, MonadError m, MonadRandom m) => CollExp -> m Collection
+evalCollExp (Roll r) = do
+               rolls <- evalRoll r 
+               return rolls
+evalCollExp (Least k ce) = do
+               rolls <- evalCollExp ce
+               let rolls' = take k (sort rolls)
+               return rolls'
+evalCollExp (Largt k ce) = do
+               rolls <- evalCollExp ce
+               let rolls' = take k (sortBy (flip compare) rolls)
+               return rolls'
+evalCollExp (Filter fop ce) = do
+               rolls <- evalCollExp ce
+               let funcfilt = evalFiltOp fop
+               return (filter funcfilt rolls)
+evalCollExp (Concat exp1 exp2) = do
+               c1 <- evalCollExp exp1
+               c2 <- evalCollExp exp2
+               return (c1 @@ c2)
 
 -- evalNumExp takes any kind of numerical expression and makes the evaluation, returning the integer.
 evalNumExp :: (MonadState m, MonadError m, MonadRandom m) => NumExp -> m Int
 evalNumExp (CONST n) = return n
 evalNumExp (MAX ce) = do
-            rolls <- evalColl ce
+            rolls <- evalCollExp ce
             return $ foldr max 0 rolls
 evalNumExp (MIN ce) = do
-            rolls <- evalColl ce
+            rolls <- evalCollExp ce
             return $ foldr min (minBound::Int) rolls
 evalNumExp (SUM ce) = do
-            rolls <- evalColl ce
+            rolls <- evalCollExp ce
             return $ sum rolls
 evalNumExp (COUNT ce) = do
-            rolls <- evalColl ce
+            rolls <- evalCollExp ce
             return $ length rolls
 
-
--- ~ -- eval Command se va a enfrentar al tema de que necesitaría que pueda retornar algo decente.
+-- eval Command se va a enfrentar al tema de que necesitaría que pueda retornar algo decente.
 
 
 -- ~ mainEval = do  
