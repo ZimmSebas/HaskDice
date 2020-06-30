@@ -10,10 +10,9 @@ import System.Random
 import Prelude
 
 
-newtype RandomState a = RS {runRS :: StdGen -> (a, StdGen)} 
+-- RandomState monad, keeps the StdGen (random number generator) as the impure value.
 
--- Esto está mal, el objetivo es que realice un pasaje con split sobre el sg. Que pase un sg y devuelva otro sg.
--- Not really sure if this works :
+newtype RandomState a = RS {runRS :: StdGen -> (a, StdGen)} 
 
 instance Monad RandomState where 
     return x = RS (\sg -> (x, sg))
@@ -27,6 +26,10 @@ instance Applicative RandomState where
     pure   = return
     (<*>)  = ap      
 
+
+
+-- getStd generates a split from the generator to maintain randomness.
+
 class Monad m => MonadState m where
     getStd :: m StdGen
     
@@ -34,6 +37,8 @@ instance MonadState RandomState where
     getStd = RS (\sg -> let (sg1,sg2) = split sg in
                            (sg1,sg2))
 
+
+-- eval is the first function to be called, to eval the result that the main call upon.
 
 eval :: StdGen -> CollExp -> ([Int],StdGen)
 eval g exp = runRS (do {res <- evalColl exp; return res}) g 
@@ -52,7 +57,7 @@ evalRoll (Z k n) = do
     return rolls
 evalRoll (C l) = return l
 
--- evalFiltOp evalua un operador posible para filter y lo devuelve en forma de función
+-- evalFiltOp eval an operator to the filter, and returns it in a function.
 evalFiltOp :: FilOp -> (Int -> Bool)
 evalFiltOp (Gt n)  = (>n)
 evalFiltOp (Lt n)  = (<n)
@@ -62,7 +67,7 @@ evalFiltOp (Eq n)  = (==n)
 evalFiltOp (NEq n) = (/=n)
 
 
--- evalColl toma una expresión de colección y devuelve la evaluación de este.
+-- evalColl takes any kind of collection expresion and returns a collection
 evalColl :: (MonadState m) => CollExp -> m Collection
 evalColl (Roll r) = do
             rolls <- evalRoll r 
@@ -86,7 +91,7 @@ evalColl (Concat exp1 exp2) = do
 
 
 
--- evalNumExp evalua una expresión de colección que devuelve un entero
+-- evalNumExp takes any kind of numerical expression and makes the evaluation, returning the integer.
 evalNumExp :: (MonadState m) => NumExp -> m Int
 evalNumExp (CONST n) = return n
 evalNumExp (MAX ce) = do

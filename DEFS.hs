@@ -10,6 +10,14 @@ import qualified Data.MultiSet as MultiSet
 -- Colecciones
 type Collection = [Int]
 
+-- Identificadores de Variable
+type Variable = String
+
+-- Valores de variable
+type Value = Either Collection Int
+
+
+
 -- Rolls representa tiradas de dados. 
 -- D representa K tiradas de dados de N caras comenzando en 1 (kdn)
 -- Z representa K tiradas de de dados de N caras comenzando en 0 (kZn)
@@ -54,6 +62,8 @@ data NumExp = CONST Int
             | COUNT CollExp
  deriving Show
 
+
+ 
 -- Commands
 data Command = Skip
              | Seq Command Command
