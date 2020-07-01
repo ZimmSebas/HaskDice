@@ -26,10 +26,10 @@ Made by @ZimmSebas, with love <3
 - ~Extend Eval~
 - ~Lists vs Multisets~ (Lists wins!)
 - ~Should i have a Boolean typed variable system?~ (Nope)
+- ~Add basic math operators, along with sign and mod (with corresponding errors control)~
 - Make a double-typed variable system (Either?). Add error (type-error variable).
 - Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
 - Research if double-typed variable is a issue in parser. 
-- Add basic math operators, along with sign and mod (with corresponding errors control)
 - Define if everything is valued type or can be collection or integer (and it's fine)
 - Decide if IfThenElse checks for empty Collection or checks a boolean operator
 - Add most of the commands

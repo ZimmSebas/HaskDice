@@ -14,13 +14,12 @@ import Prelude
 ----- Initial values and types --------
 ---------------------------------------
 
-
 -- Variable State
-type Env = [(Variable,Value)]
+type Env = [(Variable,Collection)]
 
 -- Initial State (Null)
 initState :: Env
-initState = []
+initState = [("v",[1,3])]
 
 
 ---------------------------------------
@@ -47,9 +46,9 @@ instance Monad RandomState where
 -- Class that represents monads with an enviroment of variables
 class Monad m => MonadState m where
     -- Search a variable value
-    lookfor :: Variable -> m Value
+    lookfor :: Variable -> m Collection
     -- Updates a variable value
-    update :: Variable -> Value -> m ()
+    update :: Variable -> Collection -> m ()
 
 instance MonadState RandomState where
     lookfor v = RS (\st sg -> case (lookfor' v st sg) of
@@ -73,7 +72,7 @@ instance MonadError RandomState where
     throw = RS (\st sg -> Nothing)
 
 
--- ~ -- getStd generates a split from the generator to maintain randomness.
+-- getStd generates a split from the generator to maintain randomness.
 
 class Monad m => MonadRandom m where
     getStd :: m StdGen
@@ -88,12 +87,12 @@ instance MonadRandom RandomState where
 ---------------------------------------
 
 
--- ~ -- eval is the first function to be called, to eval the result that the main call upon.
+-- eval is the first function to be called, to eval the result that the main call upon.
 
--- ~ eval :: StdGen -> CollExp -> Maybe (Value,Env)
--- ~ eval gen exp = case (runRS (do {res <- evalColl exp; return res}) initState gen) of
-    -- ~ Nothing            -> Nothing
-    -- ~ Just (val, st, sg) -> Just (val,st)
+eval :: StdGen -> NumExp -> Maybe (Int,Env)
+eval gen exp = case (runRS (do {res <- evalNumExp exp; return res}) initState gen) of
+    Nothing            -> Nothing
+    Just (val, st, sg) -> Just (val,st)
 
 
 -- evalRoll takes a Roll and generates a list of dice rolls (Ints), by using pseudo-random number generators.
@@ -119,11 +118,12 @@ evalFiltOp (Eq n)  = (==n)
 evalFiltOp (NEq n) = (/=n)
 
 
--- ~ -- evalColl takes any kind of collection expresion and returns a collection
+-- evalCollExp takes any kind of collection expresion and returns a collection
 evalCollExp :: (MonadState m, MonadError m, MonadRandom m) => CollExp -> m Collection
 evalCollExp (Roll r) = do
                rolls <- evalRoll r 
                return rolls
+evalCollExp (Var v) = lookfor v
 evalCollExp (Least k ce) = do
                rolls <- evalCollExp ce
                let rolls' = take k (sort rolls)
@@ -156,11 +156,45 @@ evalNumExp (SUM ce) = do
 evalNumExp (COUNT ce) = do
             rolls <- evalCollExp ce
             return $ length rolls
+evalNumExp (ADD x y) = do
+            x' <- evalNumExp x
+            y' <- evalNumExp y
+            return (x' + y')
+evalNumExp (MINUS x y) = do
+            x' <- evalNumExp x
+            y' <- evalNumExp y
+            return (x' - y')
+evalNumExp (TIMES x y) = do
+            x' <- evalNumExp x
+            y' <- evalNumExp y
+            return (x' * y')
+evalNumExp (DIV x y) = do
+            x' <- evalNumExp x
+            y' <- evalNumExp y
+            if (y' == 0) then throw
+                         else return (x' `div` y')
+evalNumExp (MOD x y) = do
+            x' <- evalNumExp x
+            y' <- evalNumExp y
+            if (y' == 0) then throw
+                         else return (x' `mod` y')
+evalNumExp (UMINUS x) = do
+            n  <- evalNumExp x
+            return (n*(-1))
+evalNumExp (SGN x) = do
+            n <- evalNumExp x
+            return (signum n)
 
+            
 -- eval Command takes a command and evaluates the changes in the state.
 
 
--- ~ mainEval = do  
-    -- ~ g <- newStdGen
-    -- ~ let res = fst $ eval g (Filter (GEt 5) (Largt 3 (Roll (D 4 6))))
-    -- ~ print res
+mainEval = do  
+    g <- newStdGen
+    let res = eval g (DIV (MAX (Filter (GEt 3) (Largt 3 (Roll (D 5 8))))) (CONST 0))
+    let res2 = eval g (UMINUS (MAX (Var "v")))
+    case res2 of
+        Nothing -> print "Buuuh"
+        Just (n, st) -> print n
+    print res2
+

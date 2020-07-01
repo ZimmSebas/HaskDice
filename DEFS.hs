@@ -14,7 +14,7 @@ type Collection = [Int]
 type Variable = String
 
 -- Valores de variable
-type Value = Either Collection Int
+-- ~ type Value = Either Collection Int
 
 
 -- Rolls representa tiradas de dados. 
@@ -44,6 +44,7 @@ data FilOp = Gt Int
 -- Filter es la función filter con las operaciones permitidas.
 -- Concat concatena dos resultados.
 data CollExp = Roll Rolls
+             | Var Variable
              | Least Int CollExp
              | Largt Int CollExp
              | Filter FilOp CollExp -- Filter can be a problem, should i get a boolean exp?
@@ -59,6 +60,13 @@ data NumExp = CONST Int
             | MIN CollExp
             | SUM CollExp
             | COUNT CollExp
+            | ADD NumExp NumExp
+            | MINUS NumExp NumExp
+            | TIMES NumExp NumExp
+            | DIV NumExp NumExp
+            | MOD NumExp NumExp
+            | UMINUS NumExp
+            | SGN NumExp
  deriving Show
  
 -- Commands
@@ -72,17 +80,9 @@ data Command = Skip
 
 
 
--- Not sure about this 2 sections ---------
+-- Not sure about this section ---------
 
--- Operadores sobre enteros
-data BinOp = ADD NumExp NumExp
-           | MINUS NumExp NumExp
-           | PROD NumExp NumExp
-           | DIV NumExp NumExp
-           | SGN NumExp
-           | MOD NumExp
-
--- Operadores booleanos
+-- Boolean Expressions
 
 data BoolOp = BOOL Bool
             | AND BoolOp BoolOp
