@@ -4,17 +4,18 @@ import Prelude
 import Data.MultiSet (MultiSet)
 import qualified Data.MultiSet as MultiSet
 
--- Colecciones
+-- Collections
 -- ~ type Collection = MultiSet (Int,Double)
 
--- Colecciones
+-- Collections
 type Collection = [Int]
 
--- Identificadores de Variable
+-- Variable identifiers
 type Variable = String
 
--- Valores de variable
--- ~ type Value = Either Collection Int
+-- Possible values that a command can return
+type Value = Either Collection Int
+
 
 
 -- Rolls representa tiradas de dados. 
@@ -72,11 +73,13 @@ data NumExp = CONST Int
 -- Commands
 data Command = Skip
              | Seq Command Command
-             | Indep NumExp NumExp
+             | Indep Value Value
+             | Print Value
  deriving Show
              -- ~ | IfThenElse Coll Command Command
              -- ~ | REPUNT Command Command
              -- ~ | ACC Command Command 
+
 
 
 

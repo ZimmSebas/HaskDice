@@ -1,13 +1,15 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Eval where
 
 import DEFS
-import Functions
 import Control.Applicative (Applicative(..))
 import Control.Monad       (liftM, ap)
 import Data.List
 import System.IO
 import System.Random 
 import Prelude
+
 
 
 ---------------------------------------
@@ -72,9 +74,9 @@ instance MonadError RandomState where
     throw = RS (\st sg -> Nothing)
 
 
--- getStd generates a split from the generator to maintain randomness.
-
+-- Class that represent monads that works with randomness
 class Monad m => MonadRandom m where
+    -- getStd generates a split from the generator to maintain randomness.
     getStd :: m StdGen
     
 instance MonadRandom RandomState where
@@ -88,7 +90,6 @@ instance MonadRandom RandomState where
 
 
 -- eval is the first function to be called, to eval the result that the main call upon.
-
 eval :: StdGen -> NumExp -> Maybe (Int,Env)
 eval gen exp = case (runRS (do {res <- evalNumExp exp; return res}) initState gen) of
     Nothing            -> Nothing
@@ -139,7 +140,7 @@ evalCollExp (Filter fop ce) = do
 evalCollExp (Concat exp1 exp2) = do
                c1 <- evalCollExp exp1
                c2 <- evalCollExp exp2
-               return (c1 @@ c2)
+               return (c1 ++ c2)
 
 -- evalNumExp takes any kind of numerical expression and makes the evaluation, returning the integer.
 evalNumExp :: (MonadState m, MonadError m, MonadRandom m) => NumExp -> m Int
@@ -185,11 +186,33 @@ evalNumExp (SGN x) = do
             n <- evalNumExp x
             return (signum n)
 
-            
+
+
+-- Class expression, to be able to evaluate multiple expressions
+class (MonadState m, MonadError m, MonadRandom m) => Expression a m where
+    evalE :: a -> m Value
+
+instance Expression NumExp RandomState where
+    evalE numexp = do
+        e <- evalNumExp numexp
+        return (Right e)
+
+instance Expression CollExp RandomState where
+    evalE collexp = do
+        e <- evalCollExp collexp
+        return (Left e)
+
+evalValue :: (MonadState m, MonadError m, MonadRandom m, Expression e m) => e -> m Value
+evalValue e = evalE e 
+
 -- eval Command takes a command and evaluates the changes in the state.
+-- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
+-- La cosa es que el eval de commands va a devolver un Value. Entonces devuelve todo junto y que haya un comando Print que printee y listo. Ces't fini.
 
+evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m Value
+evalCommand c = undefined
 
-mainEval = do  
+main = do  
     g <- newStdGen
     let res = eval g (DIV (MAX (Filter (GEt 3) (Largt 3 (Roll (D 5 8))))) (CONST 0))
     let res2 = eval g (UMINUS (MAX (Var "v")))
