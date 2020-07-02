@@ -72,11 +72,12 @@ data NumExp = CONST Int
  
 -- Commands
 data Command = Skip
+             | Let Variable CollExp
              | Seq Command Command
+             | IfThenElse CollExp Command Command
              | Indep Value Value
              | Print Value
  deriving Show
-             -- ~ | IfThenElse Coll Command Command
              -- ~ | REPUNT Command Command
              -- ~ | ACC Command Command 
 

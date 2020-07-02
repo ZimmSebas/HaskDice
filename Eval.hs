@@ -95,7 +95,6 @@ eval gen exp = case (runRS (do {res <- evalNumExp exp; return res}) initState ge
     Nothing            -> Nothing
     Just (val, st, sg) -> Just (val,st)
 
-
 -- evalRoll takes a Roll and generates a list of dice rolls (Ints), by using pseudo-random number generators.
 -- alternative, if it gets a Collection already evaluated, it just returns the collection.
 evalRoll :: (MonadState m, MonadError m, MonadRandom m) => Rolls -> m Collection
@@ -209,8 +208,42 @@ evalValue e = evalE e
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
 -- La cosa es que el eval de commands va a devolver un Value. Entonces devuelve todo junto y que haya un comando Print que printee y listo. Ces't fini.
 
-evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m Value
-evalCommand c = undefined
+-- ~ data Command = Skip
+             -- ~ | Single Value
+             -- ~ | Let Variable Value
+             -- ~ | Seq Command Command
+             -- ~ | Indep Value Value
+             -- ~ | Print Value
+ -- ~ deriving Show
+
+-- ~ evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m Value
+-- ~ evalCommand (Seq c1 c2) = do
+            -- ~ n <- evalCommand c1
+            -- ~ m <- evalCommand c2
+            -- ~ return m
+-- ~ evalCommand (Let name ce) = do 
+            -- ~ res <- evalCollExp ce
+            -- ~ update name res
+            -- ~ return (Left res)
+-- ~ evalCommand (IfThenElse coll c1 c2) = do
+            -- ~ co <- evalCollExp coll
+            -- ~ if (co == []) then (do {res <- evalCommand c1; return res})
+                          -- ~ else (do {res <- evalCommand c2; return res})
+
+evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m ()
+evalCommand Skip = return ()
+evalCommand (Seq c1 c2) = do
+            evalCommand c1
+            evalCommand c2
+evalCommand (Let name ce) = do 
+            res <- evalCollExp ce
+            update name res
+evalCommand (IfThenElse coll c1 c2) = do
+            co <- evalCollExp coll
+            if (co == []) then (do {evalCommand c1})
+                          else (do {evalCommand c2})
+
+    
 
 main = do  
     g <- newStdGen
