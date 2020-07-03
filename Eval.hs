@@ -2,7 +2,7 @@
 
 module Eval where
 
-import DEFS
+import AST
 import Control.Applicative (Applicative(..))
 import Control.Monad       (liftM, ap)
 import Data.List
@@ -188,21 +188,27 @@ evalNumExp (SGN x) = do
 
 
 -- Class expression, to be able to evaluate multiple expressions
-class (MonadState m, MonadError m, MonadRandom m) => Expression a m where
-    evalE :: a -> m Value
+-- ~ class (MonadState m, MonadError m, MonadRandom m) => Expression a m where
+    -- ~ evalE :: a -> m Value
 
-instance Expression NumExp RandomState where
-    evalE numexp = do
-        e <- evalNumExp numexp
-        return (Right e)
+-- ~ instance Expression NumExp RandomState where
+    -- ~ evalE numexp = do
+        -- ~ e <- evalNumExp numexp
+        -- ~ return (Right e)
 
-instance Expression CollExp RandomState where
-    evalE collexp = do
-        e <- evalCollExp collexp
-        return (Left e)
+-- ~ instance Expression CollExp RandomState where
+    -- ~ evalE collexp = do
+        -- ~ e <- evalCollExp collexp
+        -- ~ return (Left e)
 
-evalValue :: (MonadState m, MonadError m, MonadRandom m, Expression e m) => e -> m Value
-evalValue e = evalE e 
+
+evalExpr :: (MonadState m, MonadError m, MonadRandom m) => Expr -> m Value
+evalExpr (Co coll) = do 
+    c <- evalCollExp coll
+    return (Left c)
+evalExpr (Nu num)  = do
+    n <- evalNumExp num
+    return (Right n)
 
 -- eval Command takes a command and evaluates the changes in the state.
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
@@ -216,32 +222,23 @@ evalValue e = evalE e
              -- ~ | Print Value
  -- ~ deriving Show
 
--- ~ evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m Value
--- ~ evalCommand (Seq c1 c2) = do
-            -- ~ n <- evalCommand c1
-            -- ~ m <- evalCommand c2
-            -- ~ return m
--- ~ evalCommand (Let name ce) = do 
-            -- ~ res <- evalCollExp ce
-            -- ~ update name res
-            -- ~ return (Left res)
--- ~ evalCommand (IfThenElse coll c1 c2) = do
-            -- ~ co <- evalCollExp coll
-            -- ~ if (co == []) then (do {res <- evalCommand c1; return res})
-                          -- ~ else (do {res <- evalCommand c2; return res})
-
-evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m ()
-evalCommand Skip = return ()
+evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m Value
 evalCommand (Seq c1 c2) = do
-            evalCommand c1
-            evalCommand c2
+            n <- evalCommand c1
+            m <- evalCommand c2
+            return m
+evalCommand (Single e) = do
+            n <- evalExpr e
+            return n
 evalCommand (Let name ce) = do 
             res <- evalCollExp ce
             update name res
+            return (Left res)
 evalCommand (IfThenElse coll c1 c2) = do
             co <- evalCollExp coll
-            if (co == []) then (do {evalCommand c1})
-                          else (do {evalCommand c2})
+            if (co == []) then (do {res <- evalCommand c1; return res})
+                          else (do {res <- evalCommand c2; return res})
+
 
     
 
@@ -254,3 +251,17 @@ main = do
         Just (n, st) -> print n
     print res2
 
+
+
+-- ~ evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m ()
+-- ~ evalCommand Skip = return ()
+-- ~ evalCommand (Seq c1 c2) = do
+            -- ~ evalCommand c1
+            -- ~ evalCommand c2
+-- ~ evalCommand (Let name ce) = do 
+            -- ~ res <- evalCollExp ce
+            -- ~ update name res
+-- ~ evalCommand (IfThenElse coll c1 c2) = do
+            -- ~ co <- evalCollExp coll
+            -- ~ if (co == []) then (do {evalCommand c1})
+                          -- ~ else (do {evalCommand c2})

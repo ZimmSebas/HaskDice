@@ -7,7 +7,7 @@
 - ~Add a monad that keeps the state of variables~
 - ~Extend Eval~
 - ~Add basic math operators, along with sign and mod (with corresponding errors control)~
-- Change the language of DEFS.hs comments to english
+- Change the language of AST.hs comments to english
 - Add some command evaluator and test if the return system works.
 - Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
 - Decide if IfThenElse checks for empty Collection or checks a boolean operator
