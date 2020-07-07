@@ -71,9 +71,7 @@ data NumExp = CONST Int
  deriving Show
  
 -- Expr representa expresiones que pueden ser tanto CollExp como NumExp. Necesario para evaluar.
-data Expr = Co CollExp 
-          | Nu NumExp
- deriving Show
+type Expr = Either CollExp NumExp
 
 -- Commands
 data Command = Skip
@@ -81,9 +79,10 @@ data Command = Skip
              | Let Variable CollExp
              | Seq Command Command
              | IfThenElse CollExp Command Command
-             | Indep Expr Expr
-             | Print Expr
  deriving Show
+
+             -- ~ | Indep NumExp CollExp
+             -- ~ | Print Expr
              -- ~ | REPUNT Command Command
              -- ~ | ACC Command Command 
 

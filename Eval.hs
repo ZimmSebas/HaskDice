@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Eval where
@@ -90,8 +91,8 @@ instance MonadRandom RandomState where
 
 
 -- eval is the first function to be called, to eval the result that the main call upon.
-eval :: StdGen -> NumExp -> Maybe (Int,Env)
-eval gen exp = case (runRS (do {res <- evalNumExp exp; return res}) initState gen) of
+eval :: StdGen -> Command -> Maybe (Value,Env)
+eval gen exp = case (runRS (do {res <- evalCommand exp; return res}) initState gen) of
     Nothing            -> Nothing
     Just (val, st, sg) -> Just (val,st)
 
@@ -188,27 +189,22 @@ evalNumExp (SGN x) = do
 
 
 -- Class expression, to be able to evaluate multiple expressions
--- ~ class (MonadState m, MonadError m, MonadRandom m) => Expression a m where
-    -- ~ evalE :: a -> m Value
+class (MonadState m, MonadError m, MonadRandom m) => Expression a m where
+    evalE :: a -> m Value
 
--- ~ instance Expression NumExp RandomState where
-    -- ~ evalE numexp = do
-        -- ~ e <- evalNumExp numexp
-        -- ~ return (Right e)
+instance Expression CollExp RandomState where
+    evalE collexp = do
+        e <- evalCollExp collexp
+        return (Left e)
 
--- ~ instance Expression CollExp RandomState where
-    -- ~ evalE collexp = do
-        -- ~ e <- evalCollExp collexp
-        -- ~ return (Left e)
+instance Expression NumExp RandomState where
+    evalE numexp = do
+        e <- evalNumExp numexp
+        return (Right e)
 
 
-evalExpr :: (MonadState m, MonadError m, MonadRandom m) => Expr -> m Value
-evalExpr (Co coll) = do 
-    c <- evalCollExp coll
-    return (Left c)
-evalExpr (Nu num)  = do
-    n <- evalNumExp num
-    return (Right n)
+-- ~ evalExpr :: (MonadState m, MonadError m, MonadRandom m, Expression t m) => t -> m Value
+-- ~ evalExpr t = evalE t
 
 -- eval Command takes a command and evaluates the changes in the state.
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
@@ -227,9 +223,6 @@ evalCommand (Seq c1 c2) = do
             n <- evalCommand c1
             m <- evalCommand c2
             return m
-evalCommand (Single e) = do
-            n <- evalExpr e
-            return n
 evalCommand (Let name ce) = do 
             res <- evalCollExp ce
             update name res
@@ -238,14 +231,16 @@ evalCommand (IfThenElse coll c1 c2) = do
             co <- evalCollExp coll
             if (co == []) then (do {res <- evalCommand c1; return res})
                           else (do {res <- evalCommand c2; return res})
-
+-- ~ evalCommand (Single e) = do -- this doesn't work.
+            -- ~ n <- evalExpr e
+            -- ~ return n
 
     
 
 main = do  
     g <- newStdGen
-    let res = eval g (DIV (MAX (Filter (GEt 3) (Largt 3 (Roll (D 5 8))))) (CONST 0))
-    let res2 = eval g (UMINUS (MAX (Var "v")))
+    -- ~ let res = eval g (DIV (MAX (Filter (GEt 3) (Largt 3 (Roll (D 5 8))))) (CONST 0))
+    let res2 = eval g (Right (UMINUS (MAX (Var "v"))))
     case res2 of
         Nothing -> print "Buuuh"
         Just (n, st) -> print n
