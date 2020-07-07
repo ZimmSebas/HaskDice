@@ -17,7 +17,7 @@ type Variable = String
 type Value = Either Collection Int
 
 
-
+-- DKN representa ...
 -- Rolls representa tiradas de dados. 
 -- D representa K tiradas de dados de N caras comenzando en 1 (kdn)
 -- Z representa K tiradas de de dados de N caras comenzando en 0 (kZn)
@@ -52,7 +52,7 @@ data CollExp = Roll Rolls
              | Concat CollExp CollExp
  deriving Show
 
--- NumExp representa expresiones sobre colecciones que generan enteros.
+-- NumExp representa expresiones sobre colecciones o enteros y que generan enteros.
 -- Const es una constante
 -- Max y min calculan el mínimo de una colección
 -- Sum y count suman los resultados de una colección o los cuentan, respectivamente.
@@ -86,7 +86,7 @@ data Command = Skip
              -- ~ | REPUNT Command Command
              -- ~ | ACC Command Command 
 
-
+-- GADT
 
 
 -- Not sure about this section ---------

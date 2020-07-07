@@ -19,6 +19,7 @@ import Prelude
 
 -- Variable State
 type Env = [(Variable,Collection)]
+-- ~ type Env = [(Variable,Value)]
 
 -- Initial State (Null)
 initState :: Env
@@ -203,8 +204,8 @@ instance Expression NumExp RandomState where
         return (Right e)
 
 
--- ~ evalExpr :: (MonadState m, MonadError m, MonadRandom m, Expression t m) => t -> m Value
--- ~ evalExpr t = evalE t
+-- ~ evalExpr :: (MonadState m, MonadError m, MonadRandom m, Expression e m) => e -> m Value
+-- ~ evalExpr e = evalE e
 
 -- eval Command takes a command and evaluates the changes in the state.
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
@@ -223,8 +224,8 @@ evalCommand (Seq c1 c2) = do
             n <- evalCommand c1
             m <- evalCommand c2
             return m
-evalCommand (Let name ce) = do 
-            res <- evalCollExp ce
+evalCommand (Let name e) = do 
+            res <- evalCollExp e
             update name res
             return (Left res)
 evalCommand (IfThenElse coll c1 c2) = do
@@ -234,29 +235,13 @@ evalCommand (IfThenElse coll c1 c2) = do
 -- ~ evalCommand (Single e) = do -- this doesn't work.
             -- ~ n <- evalExpr e
             -- ~ return n
-
     
 
-main = do  
-    g <- newStdGen
+-- ~ main = do  
+    -- ~ g <- newStdGen
     -- ~ let res = eval g (DIV (MAX (Filter (GEt 3) (Largt 3 (Roll (D 5 8))))) (CONST 0))
-    let res2 = eval g (Right (UMINUS (MAX (Var "v"))))
-    case res2 of
-        Nothing -> print "Buuuh"
-        Just (n, st) -> print n
-    print res2
-
-
-
--- ~ evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m ()
--- ~ evalCommand Skip = return ()
--- ~ evalCommand (Seq c1 c2) = do
-            -- ~ evalCommand c1
-            -- ~ evalCommand c2
--- ~ evalCommand (Let name ce) = do 
-            -- ~ res <- evalCollExp ce
-            -- ~ update name res
--- ~ evalCommand (IfThenElse coll c1 c2) = do
-            -- ~ co <- evalCollExp coll
-            -- ~ if (co == []) then (do {evalCommand c1})
-                          -- ~ else (do {evalCommand c2})
+    -- ~ let res2 = eval g (Right (UMINUS (MAX (Var "v"))))
+    -- ~ case res2 of
+        -- ~ Nothing -> print "Buuuh"
+        -- ~ Just (n, st) -> print n
+    -- ~ print res2
