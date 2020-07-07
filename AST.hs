@@ -1,3 +1,5 @@
+{-# LANGUAGE GADTs #-}
+
 module AST where
 
 import Prelude
@@ -25,7 +27,6 @@ type Value = Either Collection Int
 --              K   N
 data Rolls = D Int Int
            | Z Int Int
-           | C Collection
  deriving Show
 
 
@@ -39,54 +40,49 @@ data FilOp = Gt Int
  deriving Show
 
 
--- CollExp representa operadores de colecciones que generan colecciones:
+-- Expression representa operadores de colecciones.
 -- Roll es un constructor sobre el tipo de datos Rolls
 -- Least y Largt representan los N elementos más chicos/grandes (respectivamente).
 -- Filter es la función filter con las operaciones permitidas.
 -- Concat concatena dos resultados.
-data CollExp = Roll Rolls
-             | Var Variable
-             | Least Int CollExp
-             | Largt Int CollExp
-             | Filter FilOp CollExp -- Filter can be a problem, should i get a boolean exp?
-             | Concat CollExp CollExp
- deriving Show
-
--- NumExp representa expresiones sobre colecciones o enteros y que generan enteros.
 -- Const es una constante
 -- Max y min calculan el mínimo de una colección
 -- Sum y count suman los resultados de una colección o los cuentan, respectivamente.
-data NumExp = CONST Int
-            | MAX CollExp
-            | MIN CollExp
-            | SUM CollExp
-            | COUNT CollExp
-            | ADD NumExp NumExp
-            | MINUS NumExp NumExp
-            | TIMES NumExp NumExp
-            | DIV NumExp NumExp
-            | MOD NumExp NumExp
-            | UMINUS NumExp
-            | SGN NumExp
- deriving Show
- 
--- Expr representa expresiones que pueden ser tanto CollExp como NumExp. Necesario para evaluar.
-type Expr = Either CollExp NumExp
+
+data Expression a where 
+     Roll   :: Rolls -> Expression Collection
+     I      :: Int -> Expression Int
+     C      :: Collection -> Expression Collection
+     Var    :: Variable -> Expression Value
+     Least  :: Int -> Expression Collection -> Expression Collection
+     Largt  :: Int -> Expression Collection -> Expression Collection
+     Filter :: FilOp -> Expression Collection -> Expression Collection
+     Concat :: Expression Collection -> Expression Collection -> Expression Collection
+     MAX    :: Expression Collection -> Expression Int
+     MIN    :: Expression Collection -> Expression Int
+     SUM    :: Expression Collection -> Expression Int
+     COUNT  :: Expression Collection -> Expression Int
+     ADD    :: Expression Int -> Expression Int -> Expression Int
+     MINUS  :: Expression Int -> Expression Int -> Expression Int
+     TIMES  :: Expression Int -> Expression Int -> Expression Int
+     DIV    :: Expression Int -> Expression Int -> Expression Int
+     MOD    :: Expression Int -> Expression Int -> Expression Int
+     UMINUS :: Expression Int -> Expression Int 
+     SGN    :: Expression Int -> Expression Int 
+
 
 -- Commands
-data Command = Skip
-             | Single Expr
-             | Let Variable CollExp
-             | Seq Command Command
-             | IfThenElse CollExp Command Command
- deriving Show
+data Command a where
+    Val        :: Command Value
+    Expr       :: Expression a -> Command Value
+    Let        :: Variable -> Expression a -> Command Value 
+    Seq        :: Command a -> Command b -> Command Value 
+    IfThenElse :: (Expression Collection) -> Command a -> Command b -> Command Value 
 
              -- ~ | Indep NumExp CollExp
              -- ~ | Print Expr
              -- ~ | REPUNT Command Command
              -- ~ | ACC Command Command 
-
--- GADT
 
 
 -- Not sure about this section ---------

@@ -1,5 +1,4 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE GADTs #-}
 
 module Eval where
 
@@ -18,12 +17,11 @@ import Prelude
 ---------------------------------------
 
 -- Variable State
-type Env = [(Variable,Collection)]
--- ~ type Env = [(Variable,Value)]
+type Env = [(Variable,Value)]
 
 -- Initial State (Null)
 initState :: Env
-initState = [("v",[1,3])]
+initState = [("v",(Left [1,3]))]
 
 
 ---------------------------------------
@@ -50,9 +48,9 @@ instance Monad RandomState where
 -- Class that represents monads with an enviroment of variables
 class Monad m => MonadState m where
     -- Search a variable value
-    lookfor :: Variable -> m Collection
+    lookfor :: Variable -> m Value
     -- Updates a variable value
-    update :: Variable -> Collection -> m ()
+    update :: Variable -> Value -> m ()
 
 instance MonadState RandomState where
     lookfor v = RS (\st sg -> case (lookfor' v st sg) of
@@ -92,8 +90,8 @@ instance MonadRandom RandomState where
 
 
 -- eval is the first function to be called, to eval the result that the main call upon.
-eval :: StdGen -> Command -> Maybe (Value,Env)
-eval gen exp = case (runRS (do {res <- evalCommand exp; return res}) initState gen) of
+eval :: StdGen -> Expression a -> Maybe (a,Env)
+eval gen exp = case (runRS (do {res <- evalExp exp; return res}) initState gen) of
     Nothing            -> Nothing
     Just (val, st, sg) -> Just (val,st)
 
@@ -108,7 +106,6 @@ evalRoll (Z k n) = do
     g' <- getStd
     let rolls = take k (randomRs (0 :: Int,n) g')
     return rolls
-evalRoll (C l) = return l
 
 -- evalFiltOp eval an operator to the filter, and returns it in a function.
 evalFiltOp :: FilOp -> (Int -> Bool)
@@ -120,92 +117,91 @@ evalFiltOp (Eq n)  = (==n)
 evalFiltOp (NEq n) = (/=n)
 
 
--- evalCollExp takes any kind of collection expresion and returns a collection
-evalCollExp :: (MonadState m, MonadError m, MonadRandom m) => CollExp -> m Collection
-evalCollExp (Roll r) = do
-               rolls <- evalRoll r 
-               return rolls
-evalCollExp (Var v) = lookfor v
-evalCollExp (Least k ce) = do
-               rolls <- evalCollExp ce
-               let rolls' = take k (sort rolls)
-               return rolls'
-evalCollExp (Largt k ce) = do
-               rolls <- evalCollExp ce
-               let rolls' = take k (sortBy (flip compare) rolls)
-               return rolls'
-evalCollExp (Filter fop ce) = do
-               rolls <- evalCollExp ce
-               let funcfilt = evalFiltOp fop
-               return (filter funcfilt rolls)
-evalCollExp (Concat exp1 exp2) = do
-               c1 <- evalCollExp exp1
-               c2 <- evalCollExp exp2
-               return (c1 ++ c2)
+     -- ~ Roll   :: Rolls -> Expression Collection
+     -- ~ I      :: Int -> Expression Int
+     -- ~ C      :: Collection -> Expression Collection
+     -- ~ Var    :: Variable -> Expression Collection 
+     -- ~ Least  :: Int -> Expression Collection -> Expression Collection
+     -- ~ Largt  :: Int -> Expression Collection -> Expression Collection
+     -- ~ Filter :: FilOp -> Expression Collection -> Expression Collection
+     -- ~ Concat :: Expression Collection -> Expression Collection -> Expression Collection
+     -- ~ MAX    :: Expression Collection -> Expression Int
+     -- ~ MIN    :: Expression Collection -> Expression Int
+     -- ~ SUM    :: Expression Collection -> Expression Int
+     -- ~ COUNT  :: Expression Collection -> Expression Int
+     -- ~ ADD    :: Expression Int -> Expression Int -> Expression Int
+     -- ~ MINUS  :: Expression Int -> Expression Int -> Expression Int
+     -- ~ TIMES  :: Expression Int -> Expression Int -> Expression Int
+     -- ~ DIV    :: Expression Int -> Expression Int -> Expression Int
+     -- ~ MOD    :: Expression Int -> Expression Int -> Expression Int
+     -- ~ UMINUS :: Expression Int -> Expression Int 
+     -- ~ SGN    :: Expression Int -> Expression Int 
 
--- evalNumExp takes any kind of numerical expression and makes the evaluation, returning the integer.
-evalNumExp :: (MonadState m, MonadError m, MonadRandom m) => NumExp -> m Int
-evalNumExp (CONST n) = return n
-evalNumExp (MAX ce) = do
-            rolls <- evalCollExp ce
+-- evalExp takes any kind of expression and returns the representation.
+evalExp :: (MonadState m, MonadError m, MonadRandom m) => Expression a -> m a
+evalExp (I n) = return n 
+evalExp (C c) = return c 
+evalExp (Var v) = lookfor v
+evalExp (Roll r) = do
+           rolls <- evalRoll r 
+           return rolls
+evalExp (Least k ce) = do
+           rolls <- evalExp ce
+           let rolls' = take k (sort rolls)
+           return rolls'
+evalExp (Largt k ce) = do
+           rolls <- evalExp ce
+           let rolls' = take k (sortBy (flip compare) rolls)
+           return rolls'
+evalExp (Filter fop ce) = do
+           rolls <- evalExp ce
+           let funcfilt = evalFiltOp fop
+           return (filter funcfilt rolls)
+evalExp (Concat exp1 exp2) = do
+           c1 <- evalExp exp1
+           c2 <- evalExp exp2
+           return (c1 ++ c2)
+evalExp (MAX ce) = do
+            rolls <- evalExp ce
             return $ foldr max 0 rolls
-evalNumExp (MIN ce) = do
-            rolls <- evalCollExp ce
+evalExp (MIN ce) = do
+            rolls <- evalExp ce
             return $ foldr min (minBound::Int) rolls
-evalNumExp (SUM ce) = do
-            rolls <- evalCollExp ce
+evalExp (SUM ce) = do
+            rolls <- evalExp ce
             return $ sum rolls
-evalNumExp (COUNT ce) = do
-            rolls <- evalCollExp ce
+evalExp (COUNT ce) = do
+            rolls <- evalExp ce
             return $ length rolls
-evalNumExp (ADD x y) = do
-            x' <- evalNumExp x
-            y' <- evalNumExp y
+evalExp (ADD x y) = do
+            x' <- evalExp x
+            y' <- evalExp y
             return (x' + y')
-evalNumExp (MINUS x y) = do
-            x' <- evalNumExp x
-            y' <- evalNumExp y
+evalExp (MINUS x y) = do
+            x' <- evalExp x
+            y' <- evalExp y
             return (x' - y')
-evalNumExp (TIMES x y) = do
-            x' <- evalNumExp x
-            y' <- evalNumExp y
+evalExp (TIMES x y) = do
+            x' <- evalExp x
+            y' <- evalExp y
             return (x' * y')
-evalNumExp (DIV x y) = do
-            x' <- evalNumExp x
-            y' <- evalNumExp y
+evalExp (DIV x y) = do
+            x' <- evalExp x
+            y' <- evalExp y
             if (y' == 0) then throw
                          else return (x' `div` y')
-evalNumExp (MOD x y) = do
-            x' <- evalNumExp x
-            y' <- evalNumExp y
+evalExp (MOD x y) = do
+            x' <- evalExp x
+            y' <- evalExp y
             if (y' == 0) then throw
                          else return (x' `mod` y')
-evalNumExp (UMINUS x) = do
-            n  <- evalNumExp x
+evalExp (UMINUS x) = do
+            n  <- evalExp x
             return (n*(-1))
-evalNumExp (SGN x) = do
-            n <- evalNumExp x
+evalExp (SGN x) = do
+            n <- evalExp x
             return (signum n)
 
-
-
--- Class expression, to be able to evaluate multiple expressions
-class (MonadState m, MonadError m, MonadRandom m) => Expression a m where
-    evalE :: a -> m Value
-
-instance Expression CollExp RandomState where
-    evalE collexp = do
-        e <- evalCollExp collexp
-        return (Left e)
-
-instance Expression NumExp RandomState where
-    evalE numexp = do
-        e <- evalNumExp numexp
-        return (Right e)
-
-
--- ~ evalExpr :: (MonadState m, MonadError m, MonadRandom m, Expression e m) => e -> m Value
--- ~ evalExpr e = evalE e
 
 -- eval Command takes a command and evaluates the changes in the state.
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
@@ -219,29 +215,26 @@ instance Expression NumExp RandomState where
              -- ~ | Print Value
  -- ~ deriving Show
 
-evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command -> m Value
+evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command a -> m Value
 evalCommand (Seq c1 c2) = do
             n <- evalCommand c1
             m <- evalCommand c2
             return m
-evalCommand (Let name e) = do 
-            res <- evalCollExp e
-            update name res
-            return (Left res)
 evalCommand (IfThenElse coll c1 c2) = do
-            co <- evalCollExp coll
+            co <- evalExp coll
             if (co == []) then (do {res <- evalCommand c1; return res})
                           else (do {res <- evalCommand c2; return res})
--- ~ evalCommand (Single e) = do -- this doesn't work.
-            -- ~ n <- evalExpr e
-            -- ~ return n
-    
+-- ~ evalCommand (Let name e) = do 
+            -- ~ res <- evalExp e
+            -- ~ update name res
+            -- ~ return res
+-- El let va a ser un viaje
 
--- ~ main = do  
-    -- ~ g <- newStdGen
-    -- ~ let res = eval g (DIV (MAX (Filter (GEt 3) (Largt 3 (Roll (D 5 8))))) (CONST 0))
+main = do  
+    g <- newStdGen
+    let res = eval g (Filter (GEt 3) (Largt 3 (Roll (D 5 8))) )
     -- ~ let res2 = eval g (Right (UMINUS (MAX (Var "v"))))
-    -- ~ case res2 of
-        -- ~ Nothing -> print "Buuuh"
-        -- ~ Just (n, st) -> print n
-    -- ~ print res2
+    case res of
+        Nothing -> print "Buuuh"
+        Just (n, st) -> print n
+    print res
