@@ -3,8 +3,8 @@
 module AST where
 
 import Prelude
-import Data.MultiSet (MultiSet)
-import qualified Data.MultiSet as MultiSet
+-- ~ import Data.MultiSet (MultiSet)
+-- ~ import qualified Data.MultiSet as MultiSet
 
 -- Collections
 -- ~ type Collection = MultiSet (Int,Double)
@@ -30,7 +30,7 @@ data Rolls = D Int Int
  deriving Show
 
 
--- FilOp representa operadores de filter.
+-- FilOp representa operadores de filter. (Add boolean)
 data FilOp = Gt Int 
            | Lt Int 
            | GEt Int 
@@ -40,6 +40,14 @@ data FilOp = Gt Int
  deriving Show
 
 
+
+-- Boolean Expressions
+
+data BoolExp = BOOL Bool
+            | AND BoolOp BoolOp
+            | OR BoolOp BoolOp
+            | IMP BoolOp BoolOp
+            
 -- Expression representa operadores de colecciones.
 -- Roll es un constructor sobre el tipo de datos Rolls
 -- Least y Largt representan los N elementos más chicos/grandes (respectivamente).
@@ -68,30 +76,19 @@ data Expression a where
      DIV    :: Expression Int -> Expression Int -> Expression Int
      MOD    :: Expression Int -> Expression Int -> Expression Int
      UMINUS :: Expression Int -> Expression Int 
-     SGN    :: Expression Int -> Expression Int 
+     SGN    :: Expression Int -> Expression Int
+     INDEP  :: Expression Int -> Expression Collection -> Expression Collection
 
 
 -- Commands
 data Command a where
-    Val        :: Command Value
     Expr       :: Expression a -> Command Value
     Let        :: Variable -> Expression a -> Command Value 
     Seq        :: Command a -> Command b -> Command Value 
     IfThenElse :: (Expression Collection) -> Command a -> Command b -> Command Value 
 
-             -- ~ | Indep NumExp CollExp
-             -- ~ | Print Expr
-             -- ~ | REPUNT Command Command
-             -- ~ | ACC Command Command 
+             -- ~ | REPUNT Command Command -- Repeat Com1 until BoolExp
+             -- ~ | ACC Command Command    -- Accumulate e1 until e2(is empty)
 
 
--- Not sure about this section ---------
-
--- Boolean Expressions
-
-data BoolOp = BOOL Bool
-            | AND BoolOp BoolOp
-            | OR BoolOp BoolOp
-            | IMP BoolOp BoolOp
-            
 

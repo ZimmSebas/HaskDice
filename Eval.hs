@@ -116,27 +116,6 @@ evalFiltOp (LEt n) = (<=n)
 evalFiltOp (Eq n)  = (==n)
 evalFiltOp (NEq n) = (/=n)
 
-
-     -- ~ Roll   :: Rolls -> Expression Collection
-     -- ~ I      :: Int -> Expression Int
-     -- ~ C      :: Collection -> Expression Collection
-     -- ~ Var    :: Variable -> Expression Collection 
-     -- ~ Least  :: Int -> Expression Collection -> Expression Collection
-     -- ~ Largt  :: Int -> Expression Collection -> Expression Collection
-     -- ~ Filter :: FilOp -> Expression Collection -> Expression Collection
-     -- ~ Concat :: Expression Collection -> Expression Collection -> Expression Collection
-     -- ~ MAX    :: Expression Collection -> Expression Int
-     -- ~ MIN    :: Expression Collection -> Expression Int
-     -- ~ SUM    :: Expression Collection -> Expression Int
-     -- ~ COUNT  :: Expression Collection -> Expression Int
-     -- ~ ADD    :: Expression Int -> Expression Int -> Expression Int
-     -- ~ MINUS  :: Expression Int -> Expression Int -> Expression Int
-     -- ~ TIMES  :: Expression Int -> Expression Int -> Expression Int
-     -- ~ DIV    :: Expression Int -> Expression Int -> Expression Int
-     -- ~ MOD    :: Expression Int -> Expression Int -> Expression Int
-     -- ~ UMINUS :: Expression Int -> Expression Int 
-     -- ~ SGN    :: Expression Int -> Expression Int 
-
 -- evalExp takes any kind of expression and returns the representation.
 evalExp :: (MonadState m, MonadError m, MonadRandom m) => Expression a -> m a
 evalExp (I n) = return n 
@@ -201,19 +180,22 @@ evalExp (UMINUS x) = do
 evalExp (SGN x) = do
             n <- evalExp x
             return (signum n)
+evalExp (INDEP n c) = do
+            cant <- evalExp n
+            coll <- evalExp c
+            if (cant > 0) then do {coll2 <- evalExp (INDEP (I (cant-1)) c) ; return (coll ++ coll2)}
+                          else return coll
 
 
 -- eval Command takes a command and evaluates the changes in the state.
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
 -- La cosa es que el eval de commands va a devolver un Value. Entonces devuelve todo junto y que haya un comando Print que printee y listo. Ces't fini.
 
--- ~ data Command = Skip
-             -- ~ | Single Value
-             -- ~ | Let Variable Value
-             -- ~ | Seq Command Command
-             -- ~ | Indep Value Value
-             -- ~ | Print Value
- -- ~ deriving Show
+-- ~ data Command a where
+    -- ~ Expr       :: Expression a -> Command Value
+    -- ~ Let        :: Variable -> Expression a -> Command Value 
+    -- ~ Seq        :: Command a -> Command b -> Command Value 
+    -- ~ IfThenElse :: (Expression Collection) -> Command a -> Command b -> Command Value 
 
 evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command a -> m Value
 evalCommand (Seq c1 c2) = do
@@ -228,7 +210,8 @@ evalCommand (IfThenElse coll c1 c2) = do
             -- ~ res <- evalExp e
             -- ~ update name res
             -- ~ return res
--- El let va a ser un viaje
+
+-- El let y el Expr van a ser un viaje
 
 main = do  
     g <- newStdGen

@@ -7,17 +7,22 @@
 - ~Add a monad that keeps the state of variables~
 - ~Extend Eval~
 - ~Add basic math operators, along with sign and mod (with corresponding errors control)~
-- Change the language of AST.hs comments to english
-- Add some command evaluator and test if the return system works.
-- Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
-- Decide if IfThenElse checks for empty Collection or checks a boolean operator
-- Add most of the commands
-- Extend Eval (again)
+- ~Add some command evaluator and test if the return system works.~ (Works)
+- ~Change AST to emulate a Generalized algebraic datatype (GADT)~ (GADT branch)
+- ~Change Eval to emulate the GADT AST~
+- Add BoolExp and EvalBoolExp
+- Change the IfThenElse and Filter to use Booleans
+- Add Let and Expr commands
+- Add Repeat and Accumulate commands
+- Add a TypeChecking System (And use it!)
+- Update error system and update eval.
 - Cry because i have to make a Lexer
 - Lexer
 - Cry again, because i have to make a Parser
 - Parser
 - Language in general
+- Change the language of AST.hs comments to english
+
 
 ## To add, maybe
 - Make a double-typed variable system (Either?). Add error (type-error variable).
@@ -26,8 +31,10 @@
 ## Questions
 - ~Lists vs Multisets~ (Lists wins!)
 - ~Should i have a Boolean typed variable system?~ (Nope)
-- Does commands return something?
-- 1 dice roll, is a Collection or a Number?
+- ~Does commands return something?~ (Yep)
+- ~1 dice roll, is a Collection or a Number?~ (Collection)
+- ~Should i have a Value variable type, or just Collections?~ (I should)
+- Should i have boolean variables?
 - Should i use a "Skip" command?
 - How does "Print" command works?
-- Should i have a Value variable type, or just Collections?
+- Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
