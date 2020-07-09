@@ -6,7 +6,6 @@ import AST
 
 
 typingValue :: Expression a -> Type
-typingValue (Roll _)  = TColl 
 typingValue (INT _)   = TInt
 typingValue (COLL _)  = TColl
 typingValue (Var _)   = TColl -- HAS TO SOLVE THE TYPE VAR
