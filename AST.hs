@@ -3,11 +3,6 @@
 module AST where
 
 import Prelude
--- ~ import Data.MultiSet (MultiSet)
--- ~ import qualified Data.MultiSet as MultiSet
-
--- Collections
--- ~ type Collection = MultiSet (Int,Double)
 
 -- Collections
 type Collection = [Int]
@@ -18,6 +13,18 @@ type Variable = String
 -- Possible values that a command can return
 type Value = Either Collection Int
 
+-- Possible Types for the TypeSystem
+data Type = TInt
+            | TColl
+            | TBool
+    deriving(Eq, Ord)
+        -- ~ | TFun Type Type
+
+
+instance Show Type where
+    show TInt  = "int"
+    show TColl = "collection"
+    show TBool = "bool"
 
 -- DKN representa ...
 -- Rolls representa tiradas de dados. 
@@ -31,12 +38,12 @@ data Rolls = D Int Int
 
 
 -- FilOp representa operadores de filter. (Add boolean)
-data FilOp = Gt Int 
-           | Lt Int 
-           | GEt Int 
-           | LEt Int
-           | Eq Int 
-           | NEq Int 
+data FilOp = Grtth Int 
+           | Lowth Int 
+           | GrtEqt Int 
+           | LowEqt Int
+           | Equal Int 
+           | NEqual Int 
  deriving Show
 
 
@@ -44,9 +51,16 @@ data FilOp = Gt Int
 -- Boolean Expressions
 
 data BoolExp = BOOL Bool
-            | AND BoolOp BoolOp
-            | OR BoolOp BoolOp
-            | IMP BoolOp BoolOp
+            | Eq (Expression Int) (Expression Int)
+            | NEq (Expression Int) (Expression Int)
+            | Lt (Expression Int) (Expression Int)
+            | Gt (Expression Int) (Expression Int)
+            | GEt (Expression Int) (Expression Int)
+            | LEt (Expression Int) (Expression Int)
+            | IsEmpty (Expression Collection)
+            | AND BoolExp BoolExp
+            | OR BoolExp BoolExp
+            | NOT BoolExp 
             
 -- Expression representa operadores de colecciones.
 -- Roll es un constructor sobre el tipo de datos Rolls
@@ -82,13 +96,13 @@ data Expression a where
 
 -- Commands
 data Command a where
-    Expr       :: Expression a -> Command Value
-    Let        :: Variable -> Expression a -> Command Value 
-    Seq        :: Command a -> Command b -> Command Value 
-    IfThenElse :: (Expression Collection) -> Command a -> Command b -> Command Value 
+    Expr       :: Expression a -> Command a
+    Let        :: Variable -> Expression a -> Command a
+    Seq        :: Command a -> Command b -> Command b 
+    IfThenElse :: BoolExp -> Command a -> Command a -> Command a 
+    ACCUM      :: Command Collection -> Command Collection -> Command Collection    -- Accumulate e1 until e2(is empty)
 
              -- ~ | REPUNT Command Command -- Repeat Com1 until BoolExp
-             -- ~ | ACC Command Command    -- Accumulate e1 until e2(is empty)
 
 
 

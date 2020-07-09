@@ -10,11 +10,12 @@
 - ~Add some command evaluator and test if the return system works.~ (Works)
 - ~Change AST to emulate a Generalized algebraic datatype (GADT)~ (GADT branch)
 - ~Change Eval to emulate the GADT AST~
-- Add BoolExp and EvalBoolExp
+- ~Add BoolExp and EvalBoolExp~
+- ~Set the monad aside in RandomState.hs~
+- Add a TypeChecking System (And use it!)
 - Change the IfThenElse and Filter to use Booleans
 - Add Let and Expr commands
 - Add Repeat and Accumulate commands
-- Add a TypeChecking System (And use it!)
 - Update error system and update eval.
 - Cry because i have to make a Lexer
 - Lexer
