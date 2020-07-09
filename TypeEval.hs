@@ -6,10 +6,10 @@ import AST
 
 
 typingValue :: Expression a -> Type
-typingValue (Roll _) = TColl 
-typingValue (I _)    = TInt
-typingValue (C _)    = TColl
-typingValue (Var _)  = TColl -- HAS TO SOLVE THE TYPE VAR
+typingValue (Roll _)  = TColl 
+typingValue (INT _)   = TInt
+typingValue (COLL _)  = TColl
+typingValue (Var _)   = TColl -- HAS TO SOLVE THE TYPE VAR
 typingValue (Least _ _)  = TColl
 typingValue (Largt _ _)  = TColl
 typingValue (Filter _ _) = TColl

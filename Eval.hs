@@ -20,9 +20,7 @@ import Prelude
 
 -- Initial State (Null)
 initState :: Env
-initState = [("v",(Left [1,3]))]
-
-
+initState = [("v",(C [1,3]))]
 
 ---------------------------------------
 ----- Evaluator -----------------------
@@ -30,8 +28,8 @@ initState = [("v",(Left [1,3]))]
 
 
 -- eval is the first function to be called, to eval the result that the main call upon.
-eval :: StdGen -> Expression a -> Maybe (a,Env)
-eval gen exp = case (runRS (do {res <- evalExp exp; return res}) initState gen) of
+eval :: StdGen -> Command a -> Maybe (Value,Env)
+eval gen exp = case (runRS (do {res <- evalCommand exp; return res}) initState gen) of
     Nothing            -> Nothing
     Just (val, st, sg) -> Just (val,st)
 
@@ -58,81 +56,81 @@ evalFiltOp (Equal n)  = (==n)
 evalFiltOp (NEqual n) = (/=n)
 
 -- evalExp takes any kind of expression and returns the representation.
-evalExp :: (MonadState m, MonadError m, MonadRandom m) => Expression a -> m a
-evalExp (I n) = return n 
-evalExp (C c) = return c 
+evalExp :: (MonadState m, MonadError m, MonadRandom m) => Expression a -> m Value
+evalExp (INT n) = return (I n) 
+evalExp (COLL c) = return (C c) 
 evalExp (Var v) = lookfor v
 evalExp (Roll r) = do
            rolls <- evalRoll r 
-           return rolls
+           return (C rolls)
 evalExp (Least k ce) = do
-           rolls <- evalExp ce
+           (C rolls) <- evalExp ce
            let rolls' = take k (sort rolls)
-           return rolls'
+           return (C rolls')
 evalExp (Largt k ce) = do
-           rolls <- evalExp ce
+           (C rolls) <- evalExp ce
            let rolls' = take k (sortBy (flip compare) rolls)
-           return rolls'
+           return (C rolls')
 evalExp (Filter fop ce) = do
-           rolls <- evalExp ce
+           (C rolls) <- evalExp ce
            let funcfilt = evalFiltOp fop
-           return (filter funcfilt rolls)
+           return $ C (filter funcfilt rolls)
 evalExp (Concat exp1 exp2) = do
-           c1 <- evalExp exp1
-           c2 <- evalExp exp2
-           return (c1 ++ c2)
+           (C c1) <- evalExp exp1
+           (C c2) <- evalExp exp2
+           return $ C (c1 ++ c2)
 evalExp (MAX ce) = do
-            rolls <- evalExp ce
-            return $ foldr max 0 rolls
+            (C rolls) <- evalExp ce
+            return (I $ foldr max 0 rolls)
 evalExp (MIN ce) = do
-            rolls <- evalExp ce
-            return $ foldr min (minBound::Int) rolls
+            (C rolls) <- evalExp ce
+            return (I $ foldr min (minBound::Int) rolls)
 evalExp (SUM ce) = do
-            rolls <- evalExp ce
-            return $ sum rolls
+            (C rolls) <- evalExp ce
+            return (I $ sum rolls)
 evalExp (COUNT ce) = do
-            rolls <- evalExp ce
-            return $ length rolls
+            (C rolls) <- evalExp ce
+            return (I $ length rolls)
 evalExp (ADD x y) = do
-            x' <- evalExp x
-            y' <- evalExp y
-            return (x' + y')
+            (I x') <- evalExp x
+            (I y') <- evalExp y
+            return $ I (x' + y')
 evalExp (MINUS x y) = do
-            x' <- evalExp x
-            y' <- evalExp y
-            return (x' - y')
+            (I x') <- evalExp x
+            (I y') <- evalExp y
+            return $ I (x' - y')
 evalExp (TIMES x y) = do
-            x' <- evalExp x
-            y' <- evalExp y
-            return (x' * y')
+            (I x') <- evalExp x
+            (I y') <- evalExp y
+            return $ I (x' * y')
 evalExp (DIV x y) = do
-            x' <- evalExp x
-            y' <- evalExp y
+            (I x') <- evalExp x
+            (I y') <- evalExp y
             if (y' == 0) then throw
-                         else return (x' `div` y')
+                         else return $ I (x' `div` y')
 evalExp (MOD x y) = do
-            x' <- evalExp x
-            y' <- evalExp y
+            (I x') <- evalExp x
+            (I y') <- evalExp y
             if (y' == 0) then throw
-                         else return (x' `mod` y')
+                         else return $ I (x' `mod` y')
 evalExp (UMINUS x) = do
-            n  <- evalExp x
-            return (n*(-1))
+            (I n) <- evalExp x
+            return $ I (n*(-1))
 evalExp (SGN x) = do
-            n <- evalExp x
-            return (signum n)
+            (I n) <- evalExp x
+            return $ I (signum n)
 evalExp (INDEP n c) = do
-            cant <- evalExp n
-            coll <- evalExp c
-            if (cant > 0) then do {coll2 <- evalExp (INDEP (I (cant-1)) c) ; return (coll ++ coll2)}
-                          else return coll
+            (I cant) <- evalExp n
+            (C coll) <- evalExp c
+            if (cant > 0) then do {(C coll2) <- evalExp (INDEP (INT (cant-1)) c) ; return $ C (coll ++ coll2)}
+                          else return (C coll)
 
 
 -- evalBoolExp takes a Boolean expression and evaluates the result
 evalBoolExp :: (MonadState m, MonadError m, MonadRandom m) => BoolExp -> m Bool
 evalBoolExp (BOOL b) = return b
 evalBoolExp (IsEmpty c) = do
-        coll <- evalExp c
+        (C coll) <- evalExp c
         return (coll == [])
 evalBoolExp (Eq e1 e2) = do
         exp1 <- evalExp e1
@@ -175,8 +173,9 @@ evalBoolExp (NOT b) = do
 -- La cosa es que el eval de commands va a devolver un Value. Entonces devuelve todo junto y que haya un comando Print que printee y listo. Ces't fini.
  
 evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command a -> m Value
-
-evalCommand (Expr exp) = undefined
+evalCommand (Expr exp) = do
+            e <- evalExp exp
+            return e
 evalCommand (Seq c1 c2) = do
             n <- evalCommand c1
             m <- evalCommand c2
@@ -185,6 +184,10 @@ evalCommand (IfThenElse b c1 c2) = do
             bool <- evalBoolExp b
             if (bool) then (do {res <- evalCommand c1; return res})
                           else (do {res <- evalCommand c2; return res})
+evalCommand (Let name e) = do  
+            res <- evalExp e
+            update name res
+            return res
 -- ~ evalCommand (ACCUM col1 col2) = do
             -- ~ Left c1 <- evalCommand col1
             -- ~ Left c2 <- evalCommand col2
@@ -192,12 +195,7 @@ evalCommand (IfThenElse b c1 c2) = do
             -- ~ case tail of
                 -- ~ Left coll -> do {head <- evalExp (Concat (C c1) (C coll)); return (Left head)}
                 -- ~ Right num -> throw
--- ~ evalCommand (Let name e) = do 
-            -- ~ let t = typingValue e 
-            -- ~ res <- evalExp e
-            -- ~ case t of
-                -- ~ TColl -> do {update name (Left res) ; return (Left res)}
-                -- ~ TInt -> do {update name (Right res) ; return (Right res)}
+
 
 
 
@@ -206,11 +204,12 @@ evalCommand (IfThenElse b c1 c2) = do
 
 main = do  
     g <- newStdGen
-    let res = eval g (Filter (GrtEqt 3) (Largt 3 (Roll (D 5 8))) )
-    let test = eval g (ADD (I 2) (I 4))
-    -- ~ let res2 = eval g (Right (UMINUS (MAX (Var "v"))))
+    let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (Roll (D 5 8))) ))
+    let test = eval g (Expr (ADD (INT 2) (INT 4)))
+    let res2 = eval g (Expr (Var "v"))
+    let res3 = eval g (Let "v" (Roll (D 1 4)))
     case res of
         Nothing -> print "Buuuh"
         Just (n, st) -> print n
-    print res
-    print test
+    print res2
+    print res3

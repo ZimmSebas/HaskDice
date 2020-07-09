@@ -11,13 +11,15 @@ type Collection = [Int]
 type Variable = String
 
 -- Possible values that a command can return
-type Value = Either Collection Int
+data Value = C Collection 
+           | I Int
+ deriving (Show, Eq, Ord)
 
 -- Possible Types for the TypeSystem
 data Type = TInt
             | TColl
             | TBool
-    deriving(Eq, Ord)
+ deriving(Eq, Ord)
         -- ~ | TFun Type Type
 
 
@@ -73,8 +75,8 @@ data BoolExp = BOOL Bool
 
 data Expression a where 
      Roll   :: Rolls -> Expression Collection
-     I      :: Int -> Expression Int
-     C      :: Collection -> Expression Collection
+     INT    :: Int -> Expression Int
+     COLL   :: Collection -> Expression Collection
      Var    :: Variable -> Expression Value
      Least  :: Int -> Expression Collection -> Expression Collection
      Largt  :: Int -> Expression Collection -> Expression Collection
