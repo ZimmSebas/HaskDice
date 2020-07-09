@@ -13,6 +13,7 @@
 - ~Add BoolExp and EvalBoolExp~
 - ~Set the monad aside in RandomState.hs~
 - Add a TypeChecking System (And use it!)
+- Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type)
 - Change the IfThenElse and Filter to use Booleans
 - Add Let and Expr commands
 - Add Repeat and Accumulate commands
