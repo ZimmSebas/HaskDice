@@ -103,8 +103,7 @@ data Command a where
     Seq        :: Command a -> Command b -> Command b 
     IfThenElse :: BoolExp -> Command a -> Command a -> Command a 
     ACCUM      :: Command Collection -> Command Collection -> Command Collection    -- Accumulate e1 until e2(is empty)
-
-             -- ~ | REPUNT Command Command -- Repeat Com1 until BoolExp
+    REPUNT     :: Command Collection -> Command Collection -> Command Collection
 
 
 

@@ -12,8 +12,6 @@ import System.IO
 import System.Random 
 import Prelude
 
-
-
 ---------------------------------------
 ----- Initial values ------------------
 ---------------------------------------
@@ -188,28 +186,33 @@ evalCommand (Let name e) = do
             res <- evalExp e
             update name res
             return res
--- ~ evalCommand (ACCUM col1 col2) = do
-            -- ~ Left c1 <- evalCommand col1
-            -- ~ Left c2 <- evalCommand col2
-            -- ~ tail <- evalCommand (IfThenElse (IsEmpty (C c2)) (Expr (C c1)) (ACCUM (Expr (C c1)) (Expr (C c2))))
-            -- ~ case tail of
-                -- ~ Left coll -> do {head <- evalExp (Concat (C c1) (C coll)); return (Left head)}
-                -- ~ Right num -> throw
+evalCommand (REPUNT (Let v c) col2) = do
+            reslet <- evalCommand (Let v c)
+            case reslet of
+                (C e1) -> do {(C c2) <- evalCommand col2;
+                              res <- evalCommand (IfThenElse (IsEmpty (COLL c2)) (Expr (COLL e1)) (REPUNT (Let v c) (Expr (COLL c2))));
+                              return res}
+                (I numb) -> throw
+evalCommand (ACCUM (Let v c) col2) = do
+            reslet <- evalCommand (Let v c)
+            case reslet of
+                (C head) -> do {(C c2) <- evalCommand col2;
+                                res <- evalCommand (IfThenElse (IsEmpty (COLL c2)) (Expr (COLL head)) (ACCUM (Expr (COLL head)) (Expr (COLL c2))));
+                                case res of
+                                    (C tail) -> do {(C list) <- evalExp (Concat (COLL head) (COLL tail)); return (C list)}
+                                    (I numb) -> throw ;}
+                (I numb) -> throw
 
+-- Voy a tener que implementar booleanos con los REPUNT y ACCUM. Ver cómo hacer eso.
 
-
-
-
--- El let y el Expr van a ser un viaje
 
 main = do  
     g <- newStdGen
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (Roll (D 5 8))) ))
-    let test = eval g (Expr (ADD (INT 2) (INT 4)))
-    let res2 = eval g (Expr (Var "v"))
-    let res3 = eval g (Let "v" (Roll (D 1 4)))
+    let test1 = eval g (Let "x" (COLL [1,2,3]))
     case res of
         Nothing -> print "Buuuh"
         Just (n, st) -> print n
-    print res2
-    print res3
+    print test1
+    -- ~ print test2
+    -- ~ print test3
