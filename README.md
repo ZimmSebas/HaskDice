@@ -1,12 +1,16 @@
 # HaskDice
 
-A DSL of dice rolls made in Haskell
+A DSL of dice rolls made in Haskell. Inspired by Troll language.
+
+Build as a libre software. 
 
 -- Work in progress --
 
 ## Prerequisites
 
 - Haskell
+- Alex
+- Happy
 
 ## License
 
