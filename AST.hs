@@ -80,7 +80,7 @@ data Expression a where
      Largt   :: Int -> Expression Collection -> Expression Collection
      Filter  :: FilOp -> Expression Collection -> Expression Collection
      Concat  :: Expression Collection -> Expression Collection -> Expression Collection
-     MAX     :: Expression Collection -> Expression Int
+     MAX     :: Expression a -> Expression Int
      MIN     :: Expression Collection -> Expression Int
      SUM     :: Expression Collection -> Expression Int
      COUNT   :: Expression Collection -> Expression Int

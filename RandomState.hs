@@ -8,6 +8,14 @@ import System.IO
 import System.Random 
 import Prelude
 
+---------------------------------------
+----- Initial types and values --------
+---------------------------------------
+
+-- Initial State (Null)
+initState :: Env
+initState = [("v",(C [1,3]))]
+
 -- Variable State
 type Env = [(Variable,Value)]
 

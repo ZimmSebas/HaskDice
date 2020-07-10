@@ -12,13 +12,6 @@ import System.IO
 import System.Random 
 import Prelude
 
----------------------------------------
------ Initial values ------------------
----------------------------------------
-
--- Initial State (Null)
-initState :: Env
-initState = [("v",(C [1,3]))]
 
 ---------------------------------------
 ----- Evaluator -----------------------
@@ -216,6 +209,12 @@ evalCommand (ACCUM (Let v c) exp) = do
 main = do  
     g <- newStdGen
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
+    let typetest = evalType (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ) initState g
+    let typetest2 = evalType (MAX (COLL [1,2,3])) initState g
+    let typetest3 = evalType (MAX (INT 2)) initState g
+    print typetest
+    print typetest2
+    print typetest3
     let test1 = eval g (Let "x" (COLL [1,2,3]))
     let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
     let test21 = eval g (Expr (Concat (COLL [1,2]) (COLL [3,4])))

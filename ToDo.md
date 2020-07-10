@@ -34,8 +34,10 @@ It works! :D
 
 ## TypeSystem idea (branch typetest) 
 
+- Add typing System (Working on it)
+- Add typing Checks (Working on it)
+- Improve typingValue. Add typingVar and typingCommand.
 - Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
-- Add a TypeChecking System (Working on it)
 - Update eval
 
 
