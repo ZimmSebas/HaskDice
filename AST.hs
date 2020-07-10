@@ -15,6 +15,16 @@ data Value = C Collection
            | I Int
            | B Bool
  deriving (Show, Eq, Ord)
+ 
+data Error a = TypingError Type Type (Expression a)
+             | VarNotExist String 
+             | DivByZero (Expression Int) (Expression Int) 
+             | ModByZero (Expression Int) (Expression Int)
+
+
+data Return a = Result a
+              | Error
+ deriving Show
 
 -- Possible Types for the TypeSystem
 data Type = TInt
