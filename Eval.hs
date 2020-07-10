@@ -209,26 +209,19 @@ evalCommand (ACCUM (Let v c) exp) = do
 main = do  
     g <- newStdGen
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
-    let typetest = evalType (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ) initState g
-    let typetest2 = evalType (MAX (COLL [1,2,3])) initState g
-    let typetest3 = evalType (MAX (INT 2)) initState g
-    print typetest
-    print typetest2
-    print typetest3
+    let typeres = evalType g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
+    print res
+    print typeres
+    
     let test1 = eval g (Let "x" (COLL [1,2,3]))
-    let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
-    let test21 = eval g (Expr (Concat (COLL [1,2]) (COLL [3,4])))
-    -- ~ let test22 = eval g (Expr (MAX (INT 2)))
-    -- ~ let test23 = eval g (Expr (MIN (COLL [6,6])))
-    -- ~ let test24 = eval g (Expr (Eq  (MAX (COLL [6,6])) (MIN (COLL [6,6])) ) )
-    -- ~ let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
-    case res of
-        Nothing -> print "Buuuh"
-        Just (n, st) -> print n
+    let typetest1 = evalType g (Let "x" (COLL [1,2,3]))
     print test1
+    print typetest1
+    
+    
+    let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
+    let typetest2 = evalType g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
     print test2
-    -- ~ print test21
-    -- ~ print test22
-    -- ~ print test23
-    -- ~ print test24
-    -- ~ print test3
+    print typetest2
+
+    -- ~ let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))

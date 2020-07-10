@@ -99,10 +99,10 @@ data Expression a where
      Gt      :: Expression Int -> Expression Int -> Expression Bool
      GEt     :: Expression Int -> Expression Int -> Expression Bool
      LEt     :: Expression Int -> Expression Int -> Expression Bool
-     IsEmpty :: Value -> Expression Bool
      AND     :: Expression Bool -> Expression Bool -> Expression Bool
      OR      :: Expression Bool -> Expression Bool -> Expression Bool
      NOT     :: Expression Bool -> Expression Bool
+     IsEmpty :: Value -> Expression Bool
 
 -- Commands
 data Command a where
