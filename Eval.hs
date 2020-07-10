@@ -87,7 +87,7 @@ evalExp (MAX ce) = do
             return (I $ foldr max 0 rolls)
 evalExp (MIN ce) = do
             (C rolls) <- evalExp ce
-            return (I $ foldr min (minBound::Int) rolls)
+            return (I $ foldr min (maxBound::Int) rolls)
 evalExp (SUM ce) = do
             (C rolls) <- evalExp ce
             return (I $ sum rolls)
@@ -187,7 +187,7 @@ evalCommand (Seq c1 c2) = do
 evalCommand (IfThenElse b c1 c2) = do
             (B bool) <- evalExp b
             if (bool) then (do {res <- evalCommand c1; return res})
-                          else (do {res <- evalCommand c2; return res})
+                      else (do {res <- evalCommand c2; return res})
 evalCommand (Let name e) = do  
             res <- evalExp e
             update name res
@@ -218,10 +218,18 @@ main = do
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
     let test1 = eval g (Let "x" (COLL [1,2,3]))
     let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
-    -- ~ let test3 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let test21 = eval g (Expr (Concat (COLL [1,2]) (COLL [3,4])))
+    -- ~ let test22 = eval g (Expr (MAX (INT 2)))
+    -- ~ let test23 = eval g (Expr (MIN (COLL [6,6])))
+    -- ~ let test24 = eval g (Expr (Eq  (MAX (COLL [6,6])) (MIN (COLL [6,6])) ) )
+    -- ~ let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     case res of
         Nothing -> print "Buuuh"
         Just (n, st) -> print n
     print test1
     print test2
+    -- ~ print test21
+    -- ~ print test22
+    -- ~ print test23
+    -- ~ print test24
     -- ~ print test3

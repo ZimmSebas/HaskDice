@@ -99,7 +99,7 @@ data Command a where
     Expr       :: Expression a -> Command a
     Let        :: Variable -> Expression a -> Command a
     Seq        :: Command a -> Command b -> Command b 
-    IfThenElse :: Expression Bool -> Command a -> Command a -> Command a 
+    IfThenElse :: Expression Bool -> Command a -> Command b -> Command c 
     ACCUM      :: Command Collection -> Command Collection -> Command Collection    -- Accumulate e1 until e2(is empty)
     REPUNT     :: Command Collection -> Command Collection -> Command Collection
 

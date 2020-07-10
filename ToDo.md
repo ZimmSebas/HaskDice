@@ -12,11 +12,12 @@
 - ~Change Eval to emulate the GADT AST~
 - ~Add BoolExp and EvalBoolExp~
 - ~Set the monad aside in RandomState.hs~
+- ~Define a "IsEmpty" format for all variables~ (Done!) 
+- ~Add Let and Expr commands~
+- ~Add Repeat and Accumulate commands~
 - Add a TypeChecking System (And use it!)
 - Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type)
 - Change the IfThenElse and Filter to use Booleans
-- Add Let and Expr commands
-- Add Repeat and Accumulate commands
 - Update error system and update eval.
 - Cry because i have to make a Lexer
 - Lexer
@@ -36,7 +37,7 @@
 - ~Does commands return something?~ (Yep)
 - ~1 dice roll, is a Collection or a Number?~ (Collection)
 - ~Should i have a Value variable type, or just Collections?~ (I should)
-- Should i have boolean variables?
-- Should i use a "Skip" command?
-- How does "Print" command works?
+- ~Should i have boolean variables?~ (Yeap)
+- ~Should i use a "Skip" command?~ (Nope)
+- ~How does "Print" command works?~ (Nope)
 - Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
