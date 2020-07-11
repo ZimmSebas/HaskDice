@@ -21,34 +21,34 @@ instance Show Value where
     show (I i) = show i
     show (B b) = show b
  
-data Error = TypingError Type Type (Expression Value)
+data Error = TypingError Type Type String
            | VarNotExist String 
            | DivByZero (Expression Int) (Expression Int) 
            | ModByZero (Expression Int) (Expression Int)
 
 instance Show Error where
-    show (TypingError t1 t2 e) = "\nExpecting type: " ++
+    show (TypingError t1 t2 e) = "\n-- Type error -- \nExpecting type: " ++
         show t1 ++
-        " but found type " ++
+        " \nbut found type " ++
         show t2 ++
-        " in expression " ++
+        " \nin expression " ++
         show e
-    show (VarNotExist s) = "The variable " ++ id s ++ " does not exist"
-    show (DivByZero e1 e2) = "A division by zero ocurred when dividing " ++
+    show (VarNotExist s) = "\n -- Variable does not exist -- \nThe variable " ++ id s ++ " does not exist"
+    show (DivByZero e1 e2) = "\nA division by zero ocurred when dividing " ++
         show e1 ++
-        " by " ++
+        " \nby \n" ++
         show e2
     show (ModByZero e1 e2) = "A mod by zero ocurred when calculing mod of " ++
         show e1 ++
-        " by " ++
+        " \nby \n" ++
         show e2
 
 
-data Return a = Result a
-              | Crash Error 
+data Result a = Return a
+              | Crash Error
 
-instance Show a => Show (Return a) where
-    show (Result r) = show r
+instance Show a => Show (Result a) where
+    show (Return r) = show r
     show (Crash e)  = show e
 
 -- Possible Types for the TypeSystem

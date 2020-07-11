@@ -10,31 +10,25 @@ import RandomState
 import System.Random 
 
 
--- Check if a program is typed correctly
-evalType :: Command a -> Maybe Type
-evalType exp = case (runTS (do { res <- typingCommand exp; return res}) initStateType) of
-              Nothing      -> Nothing
-              Just (t,_) -> Just t
-
 -- Checks if two types are equal
-equalType :: (MonadState m Type, MonadError m) => Type -> Type -> m ()
-equalType t1 t2 = if (t1 == t2) then return () 
-                                else throw -- i should say expecting type1 found type2 in expression e
+equalType :: (MonadState m Type, MonadError m) => Type -> Type -> String -> m ()
+equalType t1 t2 e = if (t1 == t2) then return () 
+                                  else throwTypingError t1 t2 e -- i should say expecting type1 found type2 in expression e
 
 -- Checks if in a binary operator that expects types t1/t2, the actual types are correct
 typingBinaryOp :: (MonadState m Type, MonadError m) => Type -> Expression a -> Type -> Expression b -> Type -> m Type
 typingBinaryOp t1 e1 t2 e2 optype = do
     actt1 <- typingExp e1
-    equalType t1 actt1 --maybe pass e1 as argument?
+    equalType t1 actt1 (show e1) --maybe pass e1 as argument?
     actt2 <- typingExp e2
-    equalType t2 actt2
+    equalType t2 actt2 (show e1)
     return optype
 
 -- Checks if a unaryOp that expects type t1 has the actual type t1. 
 typingUnaryOp :: (MonadState m Type, MonadError m) => Type -> Expression a -> Type -> m Type
 typingUnaryOp typ exp untype = do
     acttyp <- typingExp exp
-    equalType typ acttyp
+    equalType typ acttyp (show exp)
     return untype
 
 -- Checks for a Value what type it is.

@@ -9,9 +9,10 @@
 - ~Add basic math operators, along with sign and mod (with corresponding errors control)~
 - ~Add some command evaluator and test if the return system works.~ (Works)
 - ~Try with GADT~ (Done, works, now in master branch)
-- Try TypeSystem (Work in progress) 
-- Add a 'Pretty Print' system (Work in progress)
-- Cry because i have to make a Lexer
+- ~Try TypeSystem~
+- ~Add a 'Pretty Print' system~
+- Test Eval with complicated cases (Work in progress)
+- Cry because i have to make a Lexer (Work in progress)
 - Lexer
 - Cry again, because i have to make a Parser
 - Parser
@@ -41,9 +42,10 @@ It works! :D
 - ~Add a show instance for Expressions and Commands~
 - ~Add a show instance for Error~
 - ~Add a show instance for Result~
-- Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
-- Update eval
+- ~Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type)~
+- ~Update eval~
 
+It works! :D
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
@@ -55,8 +57,9 @@ It works! :D
 - ~Should i use a "Skip" command?~ (Nope)
 - ~How does "Print" command works?~ (Destroyed print)
 - ~Make a double-typed variable system (Either?). Add error (type-error variable).~ (Added)
+- ~Check if update should have returns~ (Can, but not should)
+- ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
 - Should i have a possible If Then (without else)
-- Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
 - Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans
 - Should i add functions?

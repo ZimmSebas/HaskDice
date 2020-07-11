@@ -20,11 +20,19 @@ import Prelude
 ---------------------------------------
 
 
+-- Check if a program is typed correctly
+evalType :: Command a -> Result Type
+evalType exp = case (runTS (do { res <- typingCommand exp; return res}) initStateType) of
+              Crash e      -> Crash e
+              Return (t,_) -> Return t
+
 -- eval is the first function to be called, to eval the result that the main call upon.
-eval :: StdGen -> Command a -> Maybe (Value,Env)
-eval gen exp = case (runRS (do {res <- evalCommand exp; return res}) initState gen) of
-    Nothing            -> Nothing
-    Just (val, st, sg) -> Just (val,st)
+eval :: StdGen -> Command a -> Result (Value,Env)
+eval gen exp = case evalType exp of
+                    Crash e     -> Crash e
+                    Return _    -> case (runRS (do {res <- evalCommand exp; return res}) initState gen) of
+                            Crash e              -> Crash e
+                            Return (val, st, sg) -> Return (val,st)
 
 -- evalFiltOp eval an operator to the filter, and returns it in a function.
 
@@ -92,12 +100,12 @@ evalExp (TIMES x y) = do
 evalExp (DIV x y) = do
             (I x') <- evalExp x
             (I y') <- evalExp y
-            if (y' == 0) then throw
+            if (y' == 0) then throwDivByZero x y
                          else return $ I (x' `div` y')
 evalExp (MOD x y) = do
             (I x') <- evalExp x
             (I y') <- evalExp y
-            if (y' == 0) then throw
+            if (y' == 0) then throwModByZero x y
                          else return $ I (x' `mod` y')
 evalExp (UMINUS x) = do
             (I n) <- evalExp x
@@ -176,21 +184,16 @@ evalCommand (Let name e) = do
             update name res
             return res
 evalCommand (REPUNT (Let v c) exp) = do
-            reslet <- evalCommand (Let v c)
-            case reslet of
-                (C e1) -> do {e <- evalCommand exp;
-                              res <- evalCommand (IfThenElse (IsEmpty e) (Expr (COLL e1)) (REPUNT (Let v c) exp));
-                              return res}
-                (I numb) -> throw
+            (C e1) <- evalCommand (Let v c)
+            e <- evalCommand exp;
+            res <- evalCommand (IfThenElse (IsEmpty e) (Expr (COLL e1)) (REPUNT (Let v c) exp));
+            return res
 evalCommand (ACCUM (Let v c) exp) = do
-            reslet <- evalCommand (Let v c)
-            case reslet of
-                (C head) -> do {e <- evalCommand exp;
-                                res <- evalCommand (IfThenElse (IsEmpty e) (Expr (COLL head)) (ACCUM (Expr (COLL head)) exp));
-                                case res of
-                                    (C tail) -> do {(C list) <- evalExp (Concat (COLL head) (COLL tail)); return (C list)}
-                                    (I numb) -> throw}
-                (I numb) -> throw
+            (C head) <- evalCommand (Let v c)
+            e <- evalCommand exp;
+            (C tail) <- evalCommand (IfThenElse (IsEmpty e) (Expr (COLL head)) (ACCUM (Expr (COLL head)) exp));
+            (C list) <- evalExp (Concat (COLL head) (COLL tail)) 
+            return (C list)
 
 -- Voy a tener que implementar booleanos con los REPUNT y ACCUM. Ver cómo hacer eso.
 -- Definí un estandar de IsEmpty : Bool = False, Coll = [], Int = 0
@@ -214,18 +217,12 @@ main = do
     print test2
     print typetest2
 
-    let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
-    let typetest3 = evalType (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let test3 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let typetest3 = evalType (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
-    let tt1 = evalType (Let "b" (COLL [6,6])) 
-    let tt2 = evalType (Seq (Let "b" (COLL [6,6])) (Expr (Var "b")))
-    let tt3 = evalType (Expr (Concat (Var "v") (Var "v"))) 
-    let tt4 = evalType (IfThenElse (Eq (MAX (Var "v")) (MIN (Var "v"))) (Expr (Var "v")) (Expr (Var "v")))
+    let test4 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (INT 2)) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
+        
     print test3
-    print tt1
-    print tt2
-    print tt3
-    print tt4
     print typetest3
-    
+    print test4
