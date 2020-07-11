@@ -38,9 +38,9 @@ It works! :D
 - ~Add typing Checks~ 
 - ~Improve typingValue. Add typingVar and typingCommand.~
 - ~Add a Enviroment of Type Variables. Maybe i need to change the monad for typing system.~ (New monad indeed)
-- Add a show instance for Expressions and Commands (Working on it)
-- Add a show instance for Error (Working on it)
-- Add a show instance for Result (Working on it)
+- ~Add a show instance for Expressions and Commands~
+- ~Add a show instance for Error~
+- ~Add a show instance for Result~
 - Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
 - Update eval
 
@@ -55,6 +55,7 @@ It works! :D
 - ~Should i use a "Skip" command?~ (Nope)
 - ~How does "Print" command works?~ (Destroyed print)
 - ~Make a double-typed variable system (Either?). Add error (type-error variable).~ (Added)
+- Should i have a possible If Then (without else)
 - Check if assign is needed (as a eval issue, not only as a command. Probably, yes). 
 - Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans

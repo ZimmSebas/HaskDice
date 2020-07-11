@@ -14,19 +14,42 @@ type Variable = String
 data Value = C Collection 
            | I Int
            | B Bool
- deriving (Show, Eq, Ord)
+ deriving (Eq, Ord)
+ 
+instance Show Value where
+    show (C c) = show c
+    show (I i) = show i
+    show (B b) = show b
  
 data Error = TypingError Type Type (Expression Value)
            | VarNotExist String 
            | DivByZero (Expression Int) (Expression Int) 
            | ModByZero (Expression Int) (Expression Int)
- -- ~ deriving Show -- Need a instance for show
 
+instance Show Error where
+    show (TypingError t1 t2 e) = "\nExpecting type: " ++
+        show t1 ++
+        " but found type " ++
+        show t2 ++
+        " in expression " ++
+        show e
+    show (VarNotExist s) = "The variable " ++ id s ++ " does not exist"
+    show (DivByZero e1 e2) = "A division by zero ocurred when dividing " ++
+        show e1 ++
+        " by " ++
+        show e2
+    show (ModByZero e1 e2) = "A mod by zero ocurred when calculing mod of " ++
+        show e1 ++
+        " by " ++
+        show e2
 
 
 data Return a = Result a
               | Crash Error 
- -- ~ deriving Show
+
+instance Show a => Show (Return a) where
+    show (Result r) = show r
+    show (Crash e)  = show e
 
 -- Possible Types for the TypeSystem
 data Type = TInt
@@ -37,19 +60,11 @@ data Type = TInt
 
 
 instance Show Type where
-    show TInt  = "int"
-    show TColl = "collection"
-    show TBool = "bool"
+    show TInt  = "Int"
+    show TColl = "Collection"
+    show TBool = "Bool"
 
--- DKN representa ...
--- Rolls representa tiradas de dados. 
--- D representa K tiradas de dados de N caras comenzando en 1 (kdn)
--- Z representa K tiradas de de dados de N caras comenzando en 0 (kZn)
--- C representa una tirada previamente evaluada (o sea, una colección)
---              K   N
--- ~ data Rolls = D Int Int
-           -- ~ | Z Int Int
- -- ~ deriving Show
+
 
 
 -- FilOp representa operadores de filter. (Add boolean)
@@ -59,7 +74,14 @@ data FilOp = Grtth Int
            | LowEqt Int
            | Equal Int 
            | NEqual Int 
- deriving Show
+
+instance Show FilOp where
+    show (Grtth i)  = "(>" ++ show i ++ ")" 
+    show (Lowth i)  = "(<" ++ show i ++ ")" 
+    show (GrtEqt i) = "(>=" ++ show i ++ ")" 
+    show (LowEqt i) = "(<=" ++ show i ++ ")" 
+    show (Equal i)  = "(==" ++ show i ++ ")" 
+    show (NEqual i) = "(/=" ++ show i ++ ")" 
 
 
 
@@ -71,6 +93,13 @@ data FilOp = Grtth Int
 -- Const es una constante
 -- Max y min calculan el mínimo de una colección
 -- Sum y count suman los resultados de una colección o los cuentan, respectivamente.
+
+-- DKN representa ...
+-- Rolls representa tiradas de dados. 
+-- D representa K tiradas de dados de N caras comenzando en 1 (kdn)
+-- Z representa K tiradas de de dados de N caras comenzando en 0 (kZn)
+-- C representa una tirada previamente evaluada (o sea, una colección)
+--              K   N
 
 data Expression a where 
      D       :: Int -> Int -> Expression Collection
@@ -107,11 +136,38 @@ data Expression a where
      IsEmpty :: Value -> Expression Bool
  
 instance Show (Expression a) where
-    show (D k n) = show k ++ "D" ++ show n 
-    show (Z k n) = show k ++ "Z" ++ show n
-     
-
-
+    show (D k n)        = show k ++ "D" ++ show n 
+    show (Z k n)        = show k ++ "Z" ++ show n
+    show (INT i)        = show i
+    show (COLL c)       = show c
+    show (Var v)        = id v
+    show (Least i c)    = "least " ++ show i ++ " " ++ show c
+    show (Largt i c)    = "largest " ++ show i ++ " " ++ show c
+    show (Filter fop c) = "filter " ++ show fop ++ " " ++ show c
+    show (Concat c1 c2) = show c1 ++ " ++ " ++ show c2
+    show (MAX e)        = "max " ++ show e 
+    show (MIN e)        = "min " ++ show e 
+    show (SUM e)        = "sum " ++ show e 
+    show (COUNT e)      = "count " ++ show e 
+    show (ADD e1 e2)    = show e1 ++ " + " ++ show e2
+    show (MINUS e1 e2)  = show e1 ++ " - " ++ show e2
+    show (TIMES e1 e2)  = show e1 ++ " * " ++ show e2
+    show (DIV e1 e2)    = show e1 ++ " / " ++ show e2
+    show (MOD e1 e2)    = show e1 ++ " % " ++ show e2
+    show (UMINUS e1)    = " -" ++ show e1 
+    show (SGN e1)       = "sgn " ++ show e1 
+    show (INDEP n c)    = show n ++ " # " ++ show c 
+    show (BOOL b)       = show b
+    show (Eq e1 e2)     = show e1 ++ " == " ++ show e2
+    show (NEq e1 e2)    = show e1 ++ " /= " ++ show e2
+    show (Lt e1 e2)     = show e1 ++ " < " ++ show e2
+    show (Gt e1 e2)     = show e1 ++ " > " ++ show e2
+    show (GEt e1 e2)    = show e1 ++ " >= " ++ show e2
+    show (LEt e1 e2)    = show e1 ++ " <= " ++ show e2
+    show (AND e1 e2)    = show e1 ++ " && " ++ show e2
+    show (OR e1 e2)     = show e1 ++ " || " ++ show e2
+    show (NOT e)        = "¬" ++ show e
+    show (IsEmpty v)    = "is empty " ++ show v      
  
 -- Commands
 data Command a where
@@ -121,6 +177,14 @@ data Command a where
     IfThenElse :: Expression Bool -> Command a -> Command b -> Command c 
     ACCUM      :: Command Collection -> Command Collection -> Command Collection    -- Accumulate e1 until e2(is empty)
     REPUNT     :: Command Collection -> Command Collection -> Command Collection
+
+instance Show (Command a) where
+    show (Expr e)             = show e
+    show (Let v c)            = id v ++ " := " ++ show c
+    show (Seq c1 c2)          = show c1 ++ " ; " ++ show c2
+    show (IfThenElse b c1 c2) = "if " ++ show b ++ " then " ++ show c1 ++ " else " ++ show c2
+    show (ACCUM c1 c2)        = "accumulate " ++ show c1 ++ " until " ++ show c2 
+    show (REPUNT c1 c2)       = "repeat " ++ show c1 ++ " until " ++ show c2
 
 
 
