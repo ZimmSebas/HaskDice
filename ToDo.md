@@ -34,11 +34,12 @@ It works! :D
 
 ## TypeSystem idea (branch typetest) 
 
-- Add typing System (Working on it)
-- Add typing Checks (Working on it)
+- ~Add typing System~ :D
+- ~Add typing Checks~ 
 - ~Improve typingValue. Add typingVar and typingCommand.~
-- Add a Enviroment of Type Variables. Maybe i need to change the monad for typing system.
+- ~Add a Enviroment of Type Variables. Maybe i need to change the monad for typing system.~ (New monad indeed)
 - Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
+- Add a show instance for Error (Working on it)
 - Update eval
 
 

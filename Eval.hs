@@ -1,4 +1,8 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
+
+
 
 module Eval where
 
@@ -35,7 +39,7 @@ evalFiltOp (Equal n)  = (==n)
 evalFiltOp (NEqual n) = (/=n)
 
 -- evalExp takes any kind of expression and returns the representation.
-evalExp :: (MonadState m, MonadError m, MonadRandom m) => Expression a -> m Value
+evalExp :: (MonadState m Value, MonadError m, MonadRandom m) => Expression a -> m Value
 evalExp (D k n) = do
     g' <- getStd
     let rolls = take k (randomRs (1 :: Int,n) g')
@@ -157,7 +161,7 @@ evalExp (NOT b) = do
 -- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
 -- La cosa es que el eval de commands va a devolver un Value. Entonces devuelve todo junto y que haya un comando Print que printee y listo. Ces't fini.
  
-evalCommand :: (MonadState m, MonadError m, MonadRandom m) => Command a -> m Value
+evalCommand :: (MonadState m Value, MonadError m, MonadRandom m) => Command a -> m Value
 evalCommand (Expr exp) = do
             e <- evalExp exp
             return e
@@ -197,28 +201,28 @@ evalCommand (ACCUM (Let v c) exp) = do
 main = do  
     g <- newStdGen
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
-    let typeres = evalType g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
+    let typeres = evalType (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
     print res
     print typeres
     
     let test1 = eval g (Let "x" (COLL [1,2,3]))
-    let typetest1 = evalType g (Let "x" (COLL [1,2,3]))
+    let typetest1 = evalType (Let "x" (COLL [1,2,3]))
     print test1
     print typetest1
     
     
     let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
-    let typetest2 = evalType g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
+    let typetest2 = evalType (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
     print test2
     print typetest2
 
     let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
-    let typetest3 = evalType g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let typetest3 = evalType (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
-    let tt1 = evalType g (Let "b" (COLL [6,6])) 
-    let tt2 = evalType g (Seq (Let "b" (COLL [6,6])) (Expr (Var "b"))) -- I need a enviroment of variables
-    let tt3 = evalType g (Expr (Concat (Var "v") (Var "v"))) 
-    let tt4 = evalType g (IfThenElse (Eq (MAX (Var "v")) (MIN (Var "v"))) (Expr (Var "v")) (Expr (Var "v")))
+    let tt1 = evalType (Let "b" (COLL [6,6])) 
+    let tt2 = evalType (Seq (Let "b" (COLL [6,6])) (Expr (Var "b"))) -- I need a enviroment of variables
+    let tt3 = evalType (Expr (Concat (Var "v") (Var "v"))) 
+    let tt4 = evalType (IfThenElse (Eq (MAX (Var "v")) (MIN (Var "v"))) (Expr (Var "v")) (Expr (Var "v")))
     
     print test3
     print tt1

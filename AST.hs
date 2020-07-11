@@ -16,15 +16,17 @@ data Value = C Collection
            | B Bool
  deriving (Show, Eq, Ord)
  
-data Error a = TypingError Type Type (Expression a)
-             | VarNotExist String 
-             | DivByZero (Expression Int) (Expression Int) 
-             | ModByZero (Expression Int) (Expression Int)
+data Error = TypingError Type Type (Expression Value)
+           | VarNotExist String 
+           | DivByZero (Expression Int) (Expression Int) 
+           | ModByZero (Expression Int) (Expression Int)
+ -- ~ deriving Show -- Need a instance for show
+
 
 
 data Return a = Result a
-              | Error
- deriving Show
+              | Crash Error 
+ -- ~ deriving Show
 
 -- Possible Types for the TypeSystem
 data Type = TInt
@@ -103,7 +105,10 @@ data Expression a where
      OR      :: Expression Bool -> Expression Bool -> Expression Bool
      NOT     :: Expression Bool -> Expression Bool
      IsEmpty :: Value -> Expression Bool
+ 
 
+
+ 
 -- Commands
 data Command a where
     Expr       :: Expression a -> Command a

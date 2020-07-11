@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module RandomState where
 
 import AST
@@ -20,8 +22,14 @@ initState = [("v",(C [1,3]))]
 type Env = [(Variable,Value)]
 
 
+initStateType ::TypEnv
+initStateType = [("v",TColl)]
+
+-- Typing State of variable (for type eval)
+type TypEnv = [(Variable, Type)]
+
 ---------------------------------------
------ Monads --------------------------
+----- Random State Monad --------------
 ---------------------------------------
 
 newtype RandomState a = RS { runRS :: Env -> StdGen -> Maybe (a, Env, StdGen) }
@@ -40,15 +48,40 @@ instance Monad RandomState where
                         Just (d, st', sg') -> runRS (f d) st' sg')
 
 
+---------------------------------------
+----- Type State Monad ----------------
+---------------------------------------
+
+newtype TypeState a = TS { runTS :: TypEnv -> Maybe (a,TypEnv) }
+
+instance Functor TypeState where
+    fmap = liftM
+ 
+instance Applicative TypeState where
+    pure   = return
+    (<*>)  = ap      
+
+instance Monad TypeState where 
+    return t = TS (\st -> Just (t, st))
+    m >>= f  = TS (\st -> case (runTS m st) of
+                        Nothing         -> Nothing
+                        Just (t, st')   -> runTS (f t) st')
+
+
+---------------------------------------
+----- Monad Classes and Instances -----
+---------------------------------------
+
+
 
 -- Class that represents monads with an enviroment of variables
-class Monad m => MonadState m where
+class Monad m => MonadState m a where
     -- Search a variable value
-    lookfor :: Variable -> m Value
+    lookfor :: Variable -> m a
     -- Updates a variable value
-    update :: Variable -> Value -> m ()
+    update :: Variable -> a -> m ()
 
-instance MonadState RandomState where
+instance MonadState RandomState Value where
     lookfor v = RS (\st sg -> case (lookfor' v st sg) of
                         Nothing -> Nothing
                         Just j  -> Just (j, st, sg))
@@ -60,6 +93,19 @@ instance MonadState RandomState where
                          update' v i ((u, _):ss) | v == u = (v, i):ss
                          update' v i ((u, j):ss) | v /= u = (u, j):(update' v i ss)
 
+instance MonadState TypeState Type where
+    lookfor v = TS (\st -> case (lookfor' v st) of
+                        Nothing -> Nothing
+                        Just j  -> Just (j, st))
+            where lookfor' v []          = Nothing
+                  lookfor' v ((u, j):ss) | v == u = Just j
+                                         | v /= u = lookfor' v ss
+    update v val = TS (\st -> Just ((), update' v val st))
+                   where update' v i []          = [(v, i)]
+                         update' v i ((u, _):ss) | v == u = (v, i):ss
+                         update' v i ((u, j):ss) | v /= u = (u, j):(update' v i ss)
+
+
 
 -- Class that represent monads that has possible errors
 class Monad m => MonadError m where
@@ -68,6 +114,9 @@ class Monad m => MonadError m where
 
 instance MonadError RandomState where
     throw = RS (\st sg -> Nothing)
+
+instance MonadError TypeState where
+    throw = TS (\st -> Nothing)
 
 
 -- Class that represent monads that works with randomness

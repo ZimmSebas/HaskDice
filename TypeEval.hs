@@ -1,4 +1,7 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 
 module TypeEval where
 
@@ -8,18 +11,18 @@ import System.Random
 
 
 -- Check if a program is typed correctly
-evalType :: StdGen -> Command a -> Maybe Type
-evalType gen exp = case (runRS (do { res <- typingCommand exp; return res}) initState gen) of
+evalType :: Command a -> Maybe Type
+evalType exp = case (runTS (do { res <- typingCommand exp; return res}) initStateType) of
               Nothing      -> Nothing
-              Just (t,_,_) -> Just t
+              Just (t,_) -> Just t
 
 -- Checks if two types are equal
-equalType :: (MonadState m, MonadRandom m, MonadError m) => Type -> Type -> m ()
+equalType :: (MonadState m Type, MonadError m) => Type -> Type -> m ()
 equalType t1 t2 = if (t1 == t2) then return () 
                                 else throw -- i should say expecting type1 found type2 in expression e
 
 -- Checks if in a binary operator that expects types t1/t2, the actual types are correct
-typingBinaryOp :: (MonadState m, MonadRandom m, MonadError m) => Type -> Expression a -> Type -> Expression b -> Type -> m Type
+typingBinaryOp :: (MonadState m Type, MonadError m) => Type -> Expression a -> Type -> Expression b -> Type -> m Type
 typingBinaryOp t1 e1 t2 e2 optype = do
     actt1 <- typingExp e1
     equalType t1 actt1 --maybe pass e1 as argument?
@@ -28,20 +31,20 @@ typingBinaryOp t1 e1 t2 e2 optype = do
     return optype
 
 -- Checks if a unaryOp that expects type t1 has the actual type t1. 
-typingUnaryOp :: (MonadState m, MonadRandom m, MonadError m) => Type -> Expression a -> Type -> m Type
+typingUnaryOp :: (MonadState m Type, MonadError m) => Type -> Expression a -> Type -> m Type
 typingUnaryOp typ exp untype = do
     acttyp <- typingExp exp
     equalType typ acttyp
     return untype
 
 -- Checks for a Value what type it is.
-typingValue :: (MonadState m, MonadRandom m, MonadError m) => Value -> m Type
+typingValue :: (MonadState m Type, MonadError m) => Value -> m Type
 typingValue (C _) = return TColl
 typingValue (I _) = return TInt
 typingValue (B _) = return TBool
 
 -- Checks if type of arguments of an expression are correct, and returns the type of the expression
-typingExp :: (MonadState m, MonadRandom m, MonadError m) => Expression a -> m Type
+typingExp :: (MonadState m Type, MonadError m) => Expression a -> m Type
 typingExp (D _ _)   = return TColl
 typingExp (Z _ _)   = return TColl
 typingExp (INT _)   = return TInt
@@ -76,16 +79,18 @@ typingExp (IsEmpty v) = do
     typingValue v
     return TBool
 typingExp (Var var) = do
-    v <- lookfor var 
-    t <- typingValue v
+    t <- lookfor var 
     return t
 -- ~ typingExp (Var var)   = return TColl -- Va a haber que hacer un typingVariable que es un asco
 
 
 -- Takes a command, checks the type of the result and if some command has typing errors.
-typingCommand :: (MonadState m, MonadRandom m, MonadError m) => Command a -> m Type
+typingCommand :: (MonadState m Type, MonadError m) => Command a -> m Type
 typingCommand (Expr e) = typingExp e
-typingCommand (Let v e) = typingExp e
+typingCommand (Let v e) = do
+        t <- typingExp e
+        update v t
+        return t
 typingCommand (Seq c1 c2) = do 
         tc1 <- typingCommand c1
         tc2 <- typingCommand c2
