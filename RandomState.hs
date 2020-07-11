@@ -111,8 +111,8 @@ instance MonadState TypeState Type where
 class Monad m => MonadError m where
     throwTypingError  :: Type -> Type -> String -> m a -- The Value thing may change
     throwVarNotExist  :: String -> m a
-    throwDivByZero    :: Expression Int -> Expression Int -> m a
-    throwModByZero    :: Expression Int -> Expression Int -> m a
+    throwDivByZero    :: String -> String -> m a
+    throwModByZero    :: String -> String -> m a
 
 instance MonadError RandomState where
     throwTypingError t1 t2 s = RS (\st sg -> Crash $ TypingError t1 t2 s)
@@ -128,8 +128,8 @@ instance MonadError RandomState where
 instance MonadError TypeState where
     throwTypingError t1 t2 s = TS (\st -> Crash $ TypingError t1 t2 s)
     throwVarNotExist v       = TS (\st -> Crash $ VarNotExist v)
-    throwDivByZero e1 e2     = TS (\st -> Crash $ DivByZero e1 e2)
-    throwModByZero e1 e2     = TS (\st -> Crash $ ModByZero e1 e2)
+    throwDivByZero s1 s2     = TS (\st -> Crash $ DivByZero s1 s2)
+    throwModByZero s1 s2     = TS (\st -> Crash $ ModByZero s1 s2)
 
 -- Class that represent monads that works with randomness
 class Monad m => MonadRandom m where

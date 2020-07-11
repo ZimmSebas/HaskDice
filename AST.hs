@@ -23,25 +23,27 @@ instance Show Value where
  
 data Error = TypingError Type Type String
            | VarNotExist String 
-           | DivByZero (Expression Int) (Expression Int) 
-           | ModByZero (Expression Int) (Expression Int)
+           | DivByZero String String 
+           | ModByZero String String
 
 instance Show Error where
-    show (TypingError t1 t2 e) = "\n-- Type error -- \nExpecting type: " ++
+    show (TypingError t1 t2 e) = "\n -- Error: Type error -- \nExpecting type: " ++
         show t1 ++
-        " \nbut found type " ++
+        " \nbut found type: " ++
         show t2 ++
         " \nin expression " ++
-        show e
-    show (VarNotExist s) = "\n -- Variable does not exist -- \nThe variable " ++ id s ++ " does not exist"
-    show (DivByZero e1 e2) = "\nA division by zero ocurred when dividing " ++
+        show e ++ ".\n"
+    show (VarNotExist s) = "\n -- Error: Variable does not exist -- \nThe variable \"" ++ id s ++ "\" does not exist"
+    show (DivByZero e1 e2) = "\n -- Error: Division by Zero -- \n" ++ 
+        "A division by zero ocurred when dividing: \n" ++
         show e1 ++
-        " \nby \n" ++
-        show e2
-    show (ModByZero e1 e2) = "A mod by zero ocurred when calculing mod of " ++
+        " \nby: \n" ++
+        show e2 ++ ".\n"
+    show (ModByZero e1 e2) = "\n -- Error: Mod by Zero -- \n" ++ 
+        "A mod by zero ocurred when calculating mod of\n" ++
         show e1 ++
-        " \nby \n" ++
-        show e2
+        " \nby: \n" ++
+        show e2 ++ ".\n"
 
 
 data Result a = Return a
@@ -107,32 +109,32 @@ data Expression a where
      INT     :: Int -> Expression Int
      COLL    :: Collection -> Expression Collection
      Var     :: Variable -> Expression Value
-     Least   :: Int -> Expression Collection -> Expression Collection
-     Largt   :: Int -> Expression Collection -> Expression Collection
-     Filter  :: FilOp -> Expression Collection -> Expression Collection
-     Concat  :: Expression a -> Expression a -> Expression Collection
+     Least   :: Int -> Expression a -> Expression Collection
+     Largt   :: Int -> Expression a -> Expression Collection
+     Filter  :: FilOp -> Expression a -> Expression Collection
+     Concat  :: Expression a -> Expression b -> Expression Collection
      MAX     :: Expression a -> Expression Int
      MIN     :: Expression a -> Expression Int
-     SUM     :: Expression Collection -> Expression Int
-     COUNT   :: Expression Collection -> Expression Int
-     ADD     :: Expression Int -> Expression Int -> Expression Int
-     MINUS   :: Expression Int -> Expression Int -> Expression Int
-     TIMES   :: Expression Int -> Expression Int -> Expression Int
-     DIV     :: Expression Int -> Expression Int -> Expression Int
-     MOD     :: Expression Int -> Expression Int -> Expression Int
-     UMINUS  :: Expression Int -> Expression Int 
-     SGN     :: Expression Int -> Expression Int
-     INDEP   :: Expression Int -> Expression Collection -> Expression Collection
+     SUM     :: Expression a -> Expression Int
+     COUNT   :: Expression a -> Expression Int
+     ADD     :: Expression a -> Expression b -> Expression Int
+     MINUS   :: Expression a -> Expression b -> Expression Int
+     TIMES   :: Expression a -> Expression b -> Expression Int
+     DIV     :: Expression a -> Expression b -> Expression Int
+     MOD     :: Expression a -> Expression b -> Expression Int
+     UMINUS  :: Expression a -> Expression Int 
+     SGN     :: Expression a -> Expression Int
+     INDEP   :: Expression a -> Expression b -> Expression Collection
      BOOL    :: Bool -> Expression Bool
-     Eq      :: Expression Int -> Expression Int -> Expression Bool
-     NEq     :: Expression Int -> Expression Int -> Expression Bool
-     Lt      :: Expression Int -> Expression Int -> Expression Bool
-     Gt      :: Expression Int -> Expression Int -> Expression Bool
-     GEt     :: Expression Int -> Expression Int -> Expression Bool
-     LEt     :: Expression Int -> Expression Int -> Expression Bool
-     AND     :: Expression Bool -> Expression Bool -> Expression Bool
-     OR      :: Expression Bool -> Expression Bool -> Expression Bool
-     NOT     :: Expression Bool -> Expression Bool
+     Eq      :: Expression a -> Expression b -> Expression Bool
+     NEq     :: Expression a -> Expression b -> Expression Bool
+     Lt      :: Expression a -> Expression b -> Expression Bool
+     Gt      :: Expression a -> Expression b -> Expression Bool
+     GEt     :: Expression a -> Expression b -> Expression Bool
+     LEt     :: Expression a -> Expression b -> Expression Bool
+     AND     :: Expression a -> Expression b -> Expression Bool
+     OR      :: Expression a -> Expression b -> Expression Bool
+     NOT     :: Expression a -> Expression Bool
      IsEmpty :: Value -> Expression Bool
  
 instance Show (Expression a) where

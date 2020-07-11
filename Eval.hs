@@ -100,12 +100,12 @@ evalExp (TIMES x y) = do
 evalExp (DIV x y) = do
             (I x') <- evalExp x
             (I y') <- evalExp y
-            if (y' == 0) then throwDivByZero x y
+            if (y' == 0) then throwDivByZero (show x) (show y)
                          else return $ I (x' `div` y')
 evalExp (MOD x y) = do
             (I x') <- evalExp x
             (I y') <- evalExp y
-            if (y' == 0) then throwModByZero x y
+            if (y' == 0) then throwModByZero (show x) (show y)
                          else return $ I (x' `mod` y')
 evalExp (UMINUS x) = do
             (I n) <- evalExp x
@@ -222,7 +222,19 @@ main = do
     
     let test4 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (INT 2)) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
+    -- ~ let test5 = eval g (ACCUM (Let "b" (D 2 6)) (Expr (Eq (MAX (INT 2)) (MIN (Var "b"))))  )
+    let test6 = eval g (Seq (Let "a" (D 1 6)) (Seq (Let "b" (D 1 6)) (Seq (Let "c" (D 1 6)) (Let "d" (D 1 6)) ) ) )
+    let testdivZero = eval g (Expr (DIV (SUM (D 1 6)) (INT 0)) )
+    let testmodZero = eval g (Expr (MOD (SUM (D 1 6)) (INT 0)) )
+    let testnodVar  = eval g (Expr (ADD (Var "b") (INT 0)) )
+    
         
     print test3
     print typetest3
     print test4
+    -- ~ print test5
+    print test6
+
+    print testdivZero 
+    print testmodZero 
+    print testnodVar  

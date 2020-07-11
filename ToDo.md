@@ -11,6 +11,7 @@
 - ~Try with GADT~ (Done, works, now in master branch)
 - ~Try TypeSystem~
 - ~Add a 'Pretty Print' system~
+- Modify ACCUM and REPUNT for better uses
 - Test Eval with complicated cases (Work in progress)
 - Cry because i have to make a Lexer (Work in progress)
 - Lexer
