@@ -106,6 +106,10 @@ data Expression a where
      NOT     :: Expression Bool -> Expression Bool
      IsEmpty :: Value -> Expression Bool
  
+instance Show (Expression a) where
+    show (D k n) = show k ++ "D" ++ show n 
+    show (Z k n) = show k ++ "Z" ++ show n
+     
 
 
  

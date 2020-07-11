@@ -2,8 +2,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-
-
 module Eval where
 
 import AST
@@ -220,7 +218,7 @@ main = do
     let typetest3 = evalType (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
     let tt1 = evalType (Let "b" (COLL [6,6])) 
-    let tt2 = evalType (Seq (Let "b" (COLL [6,6])) (Expr (Var "b"))) -- I need a enviroment of variables
+    let tt2 = evalType (Seq (Let "b" (COLL [6,6])) (Expr (Var "b")))
     let tt3 = evalType (Expr (Concat (Var "v") (Var "v"))) 
     let tt4 = evalType (IfThenElse (Eq (MAX (Var "v")) (MIN (Var "v"))) (Expr (Var "v")) (Expr (Var "v")))
     

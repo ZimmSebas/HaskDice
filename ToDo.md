@@ -10,7 +10,7 @@
 - ~Add some command evaluator and test if the return system works.~ (Works)
 - ~Try with GADT~ (Done, works, now in master branch)
 - Try TypeSystem (Work in progress) 
-- Add a 'Pretty Print' system
+- Add a 'Pretty Print' system (Work in progress)
 - Cry because i have to make a Lexer
 - Lexer
 - Cry again, because i have to make a Parser
@@ -38,8 +38,10 @@ It works! :D
 - ~Add typing Checks~ 
 - ~Improve typingValue. Add typingVar and typingCommand.~
 - ~Add a Enviroment of Type Variables. Maybe i need to change the monad for typing system.~ (New monad indeed)
-- Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
+- Add a show instance for Expressions and Commands (Working on it)
 - Add a show instance for Error (Working on it)
+- Add a show instance for Result (Working on it)
+- Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
 - Update eval
 
 

@@ -81,8 +81,6 @@ typingExp (IsEmpty v) = do
 typingExp (Var var) = do
     t <- lookfor var 
     return t
--- ~ typingExp (Var var)   = return TColl -- Va a haber que hacer un typingVariable que es un asco
-
 
 -- Takes a command, checks the type of the result and if some command has typing errors.
 typingCommand :: (MonadState m Type, MonadError m) => Command a -> m Type
