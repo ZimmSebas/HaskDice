@@ -79,9 +79,9 @@ data Expression a where
      Least   :: Int -> Expression Collection -> Expression Collection
      Largt   :: Int -> Expression Collection -> Expression Collection
      Filter  :: FilOp -> Expression Collection -> Expression Collection
-     Concat  :: Expression Collection -> Expression Collection -> Expression Collection
+     Concat  :: Expression a -> Expression a -> Expression Collection
      MAX     :: Expression a -> Expression Int
-     MIN     :: Expression Collection -> Expression Int
+     MIN     :: Expression a -> Expression Int
      SUM     :: Expression Collection -> Expression Int
      COUNT   :: Expression Collection -> Expression Int
      ADD     :: Expression Int -> Expression Int -> Expression Int

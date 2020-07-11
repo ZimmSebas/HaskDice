@@ -72,14 +72,20 @@ typingExp (LEt x y) = typingBinaryOp TInt x TInt y TBool
 typingExp (AND p q) = typingBinaryOp TBool p TBool q TBool
 typingExp (OR p q) = typingBinaryOp TBool p TBool q TBool
 typingExp (NOT p) = typingUnaryOp TBool p TBool
--- ~ typingExp (IsEmpty e) = typingValue v -- This may be an issue with commands
+typingExp (IsEmpty v) = do
+    typingValue v
+    return TBool
+typingExp (Var var) = do
+    v <- lookfor var 
+    t <- typingValue v
+    return t
 -- ~ typingExp (Var var)   = return TColl -- Va a haber que hacer un typingVariable que es un asco
 
 
 -- Takes a command, checks the type of the result and if some command has typing errors.
 typingCommand :: (MonadState m, MonadRandom m, MonadError m) => Command a -> m Type
 typingCommand (Expr e) = typingExp e
-typingCommand (Let v e) = typingExp e -- Enviroment of types?
+typingCommand (Let v e) = typingExp e
 typingCommand (Seq c1 c2) = do 
         tc1 <- typingCommand c1
         tc2 <- typingCommand c2

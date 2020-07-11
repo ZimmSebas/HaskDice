@@ -24,18 +24,6 @@ eval gen exp = case (runRS (do {res <- evalCommand exp; return res}) initState g
     Nothing            -> Nothing
     Just (val, st, sg) -> Just (val,st)
 
--- evalRoll takes a Roll and generates a list of dice rolls (Ints), by using pseudo-random number generators.
--- alternative, if it gets a Collection already evaluated, it just returns the collection.
--- ~ evalRoll :: (MonadState m, MonadError m, MonadRandom m) => Rolls -> m Collection
--- ~ evalRoll (D k n) = do
-    -- ~ g' <- getStd
-    -- ~ let rolls = take k (randomRs (1 :: Int,n) g')
-    -- ~ return rolls
--- ~ evalRoll (Z k n) = do
-    -- ~ g' <- getStd
-    -- ~ let rolls = take k (randomRs (0 :: Int,n) g')
-    -- ~ return rolls
-
 -- evalFiltOp eval an operator to the filter, and returns it in a function.
 
 evalFiltOp :: FilOp -> (Int -> Bool)
@@ -224,4 +212,18 @@ main = do
     print test2
     print typetest2
 
-    -- ~ let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let test3 = eval g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let typetest3 = evalType g (Seq (Let "b" (COLL [6,6])) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    
+    let tt1 = evalType g (Let "b" (COLL [6,6])) 
+    let tt2 = evalType g (Seq (Let "b" (COLL [6,6])) (Expr (Var "b"))) -- I need a enviroment of variables
+    let tt3 = evalType g (Expr (Concat (Var "v") (Var "v"))) 
+    let tt4 = evalType g (IfThenElse (Eq (MAX (Var "v")) (MIN (Var "v"))) (Expr (Var "v")) (Expr (Var "v")))
+    
+    print test3
+    print tt1
+    print tt2
+    print tt3
+    print tt4
+    print typetest3
+    

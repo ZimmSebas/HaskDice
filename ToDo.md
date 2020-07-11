@@ -36,7 +36,8 @@ It works! :D
 
 - Add typing System (Working on it)
 - Add typing Checks (Working on it)
-- Improve typingValue. Add typingVar and typingCommand.
+- ~Improve typingValue. Add typingVar and typingCommand.~
+- Add a Enviroment of Type Variables. Maybe i need to change the monad for typing system.
 - Change the Error system, adding different types of errors (Changing the monad from Maybe to a new Error type) (Working on it)
 - Update eval
 
