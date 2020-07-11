@@ -33,7 +33,7 @@
 It works! :D
 
 
-## TypeSystem idea (branch typetest) 
+## TypeSystem idea (typetest branch ) (Done, added to master branch)
 
 - ~Add typing System~ :D
 - ~Add typing Checks~ 
