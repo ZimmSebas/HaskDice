@@ -5,6 +5,7 @@ import AST}
 
 $digit = 0-9              -- digits
 $alpha = [a-zA-Z]         -- alphabetic characters
+$lower = [a-z]            -- alphabetic lowercase characters
 
 tokens :- 
     $white+                             ;
@@ -32,7 +33,7 @@ tokens :-
     "true"                              { \pos str -> TokenTrue pos }
     "false"                             { \pos str -> TokenFalse pos }
     \#                                  { \pos str -> TokenIndep pos }
-    $digit "D" $digit                   { \pos str -> TokenD pos }
+    "D"                                 { \pos str -> TokenD pos }
     "Z"                                 { \pos str -> TokenZ pos }
     "least"                             { \pos str -> TokenLeast pos }
     "largest"                           { \pos str -> TokenLargt pos }
@@ -51,7 +52,7 @@ tokens :-
     "accum"                             { \pos str -> TokenACCUM pos }
     "repeat"                            { \pos str -> TokenREPEAT pos }
     "until"                             { \pos str -> TokenUNTIL pos }
-    $alpha [$alpha $digit \_ \']*       { \pos str -> TokenName pos str}
+    $lower [$alpha $digit \_ \']*       { \pos str -> TokenName pos str}
 
 
 {

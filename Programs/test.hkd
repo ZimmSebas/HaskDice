@@ -1,1 +1,9 @@
-if (max bd) < (min Dia) then (sum 2D6) else (count 2D6) ; accum c := 2D6 until (count c) > 3 
+if (max bd) < (min dia) then (sum 2D6) else (count 2D6) ; accum c := 2D6 until (count c) > 3 
+repeat x := 1D6 until (sum x) == 0
+(sum 1D4) # 1D6
+filter (<3) [1,2,3]
+¬true && false
+2/3 * 15 % 4 + 3 - 5 + (-6)
+>= > < <= == /=
+is empty false
+true || true

@@ -21,6 +21,7 @@ instance Show Value where
     show (I i) = show i
     show (B b) = show b
  
+-- Possible errors that the program may have
 data Error = TypingError Type Type String
            | VarNotExist String 
            | DivByZero String String 
@@ -45,13 +46,14 @@ instance Show Error where
         " \nby: \n" ++
         show e2 ++ ".\n"
 
-
+-- The result of an evaluation (type or value)
 data Result a = Return a
               | Crash Error
 
 instance Show a => Show (Result a) where
     show (Return r) = show r
     show (Crash e)  = show e
+
 
 -- Possible Types for the TypeSystem
 data Type = TInt
@@ -60,7 +62,6 @@ data Type = TInt
  deriving(Eq, Ord)
         -- ~ | TFun Type Type
 
-
 instance Show Type where
     show TInt  = "Int"
     show TColl = "Collection"
@@ -68,8 +69,7 @@ instance Show Type where
 
 
 
-
--- FilOp representa operadores de filter. (Add boolean)
+-- FilOp representa operadores de filter.
 data FilOp = Grtth Int 
            | Lowth Int 
            | GrtEqt Int 
@@ -108,6 +108,7 @@ data Expression a where
      Z       :: Int -> Int -> Expression Collection
      INT     :: Int -> Expression Int
      COLL    :: Collection -> Expression Collection
+     BOOL    :: Bool -> Expression Bool
      Var     :: Variable -> Expression Value
      Least   :: Int -> Expression a -> Expression Collection
      Largt   :: Int -> Expression a -> Expression Collection
@@ -125,7 +126,6 @@ data Expression a where
      UMINUS  :: Expression a -> Expression Int 
      SGN     :: Expression a -> Expression Int
      INDEP   :: Expression a -> Expression b -> Expression Collection
-     BOOL    :: Bool -> Expression Bool
      Eq      :: Expression a -> Expression b -> Expression Bool
      NEq     :: Expression a -> Expression b -> Expression Bool
      Lt      :: Expression a -> Expression b -> Expression Bool
@@ -177,8 +177,8 @@ data Command a where
     Let        :: Variable -> Expression a -> Command a
     Seq        :: Command a -> Command b -> Command b 
     IfThenElse :: Expression Bool -> Command a -> Command b -> Command c  -- Need to destroy the 'Bool'
-    ACCUM      :: Command Collection -> Command Collection -> Command Collection    -- Accumulate e1 until e2(is empty)
-    REPUNT     :: Command Collection -> Command Collection -> Command Collection
+    ACCUM      :: Command Collection -> Command a -> Command Collection    -- Accumulate e1 until e2(is empty)
+    REPUNT     :: Command Collection -> Command a -> Command Collection
 
 instance Show (Command a) where
     show (Expr e)             = show e
@@ -187,6 +187,3 @@ instance Show (Command a) where
     show (IfThenElse b c1 c2) = "if " ++ show b ++ " then " ++ show c1 ++ " else " ++ show c2
     show (ACCUM c1 c2)        = "accumulate " ++ show c1 ++ " until " ++ show c2 
     show (REPUNT c1 c2)       = "repeat " ++ show c1 ++ " until " ++ show c2
-
-
-

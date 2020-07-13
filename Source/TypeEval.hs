@@ -31,6 +31,14 @@ typingUnaryOp typ exp untype = do
     equalType typ acttyp (show exp)
     return untype
 
+-- Checks if a unaryOp that expects type t1 has the actual type t1. 
+typingUnaryCommand :: (MonadState m Type, MonadError m) => Type -> Command a -> Type -> m Type
+typingUnaryCommand typ com untype = do
+    acttyp <- typingCommand com
+    equalType typ acttyp (show com)
+    return untype
+
+
 -- Checks for a Value what type it is.
 typingValue :: (MonadState m Type, MonadError m) => Value -> m Type
 typingValue (C _) = return TColl
@@ -93,10 +101,10 @@ typingCommand (IfThenElse b c1 c2) = do
         tc2 <- typingCommand c2
         return tc2
 typingCommand (ACCUM c1 c2) = do
-        tc1 <- typingCommand c1
+        tc1 <- typingUnaryCommand TColl c1 TColl
         tc2 <- typingCommand c2
         return tc1
 typingCommand (REPUNT c1 c2) = do
-        tc1 <- typingCommand c1
+        tc1 <- typingUnaryCommand TColl c1 TColl
         tc2 <- typingCommand c2
         return tc1        

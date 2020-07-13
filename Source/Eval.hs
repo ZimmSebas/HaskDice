@@ -122,7 +122,7 @@ evalExp (BOOL b) = return (B b)
 evalExp (IsEmpty v) = do
         case v of
             (C coll) -> return $ B (coll == [])
-            (B bool) -> return $ B False
+            (B bool) -> return $ B (bool == True)
             (I numb) -> return $ B (numb == 0)
 evalExp (Eq e1 e2) = do
         (I n) <- evalExp e1
@@ -191,9 +191,10 @@ evalCommand (REPUNT (Let v c) exp) = do
 evalCommand (ACCUM (Let v c) exp) = do
             (C head) <- evalCommand (Let v c)
             e <- evalCommand exp;
-            (C tail) <- evalCommand (IfThenElse (IsEmpty e) (Expr (COLL head)) (ACCUM (Expr (COLL head)) exp));
+            (C tail) <- evalCommand (IfThenElse (IsEmpty e) (Expr (COLL [])) (ACCUM (Let v c) exp));
             (C list) <- evalExp (Concat (COLL head) (COLL tail)) 
             return (C list)
+
 
 -- Voy a tener que implementar booleanos con los REPUNT y ACCUM. Ver cómo hacer eso.
 -- Definí un estandar de IsEmpty : Bool = False, Coll = [], Int = 0
@@ -203,38 +204,52 @@ main = do
     g <- newStdGen
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
     let typeres = evalType (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
-    print res
-    print typeres
+    -- ~ print res
+    -- ~ print typeres
     
     let test1 = eval g (Let "x" (COLL [1,2,3]))
     let typetest1 = evalType (Let "x" (COLL [1,2,3]))
-    print test1
-    print typetest1
+    -- ~ print test1
+    -- ~ print typetest1
     
     
     let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
     let typetest2 = evalType (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
-    print test2
-    print typetest2
+    -- ~ print test2
+    -- ~ print typetest2
 
     let test3 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     let typetest3 = evalType (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
     let test4 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (INT 2)) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
-    -- ~ let test5 = eval g (ACCUM (Let "b" (D 2 6)) (Expr (Eq (MAX (INT 2)) (MIN (Var "b"))))  )
+    let test5 = eval g (ACCUM (Let "b" (D 2 6)) (Expr (Eq (MAX (INT 2)) (MIN (Var "b"))))  )
     let test6 = eval g (Seq (Let "a" (D 1 6)) (Seq (Let "b" (D 1 6)) (Seq (Let "c" (D 1 6)) (Let "d" (D 1 6)) ) ) )
     let testdivZero = eval g (Expr (DIV (SUM (D 1 6)) (INT 0)) )
     let testmodZero = eval g (Expr (MOD (SUM (D 1 6)) (INT 0)) )
     let testnodVar  = eval g (Expr (ADD (Var "b") (INT 0)) )
+    -- ~ let test7 = eval g (ACCUM (Let "a" (D 1 6)) (Expr (BOOL False)))
+    -- ~ let test7 = eval g (ACCUM (Let "a" (D 1 6)) (Expr (Gt (MAX (Var "a")) (INT 3))))
+    let testgreater = eval g (ACCUM (Let "a" (D 1 6)) (Expr (Gt (MAX (Var "a")) (INT 3))))
+    let test8 = eval g (REPUNT (Let "a" (D 1 6)) (Expr (Eq (MAX (Var "a")) (INT 6))))
     
         
-    print test3
-    print typetest3
-    print test4
+    -- ~ print test3
+    -- ~ print typetest3
+    -- ~ print "test 4: "
+    -- ~ print test4
+    -- ~ print "test 5: "
     -- ~ print test5
-    print test6
+    -- ~ print "test 6: "
+    -- ~ print test6
 
-    print testdivZero 
-    print testmodZero 
-    print testnodVar  
+    print "test greater"
+    print testgreater
+    print "test 8: "
+    print test8
+
+
+
+    -- ~ print testdivZero 
+    -- ~ print testmodZero 
+    -- ~ print testnodVar  

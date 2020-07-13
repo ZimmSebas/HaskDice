@@ -11,13 +11,14 @@
 - ~Try with GADT~ (Done, works, now in master branch)
 - ~Try TypeSystem~
 - ~Add a 'Pretty Print' system~
-- Modify ACCUM and REPUNT for better uses
+- ~Modify ACCUM and REPUNT for better uses~
 - ~Test Eval with complicated cases~
 - ~Cry because i have to make a Lexer~
-- Lexer (Work in progress)
-- Cry again, because i have to make a Parser
-- Parser
-- Add the file and interactive mode
+- ~Lexer~
+- Cry again, because i have to make a Parser (Work in progress)
+- Parser (Work in progress)
+- Add the file mode
+- Add the interactive mode
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
 
@@ -50,7 +51,7 @@ It works! :D
 
 ## Lexer issues to solve
 
-- The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.
+- ~The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.~ (Now variables start with lowercase characters)
 - Needs extra testing with powerfull cases.
 
 ### Questions and Researchs
@@ -65,7 +66,7 @@ It works! :D
 - ~Make a double-typed variable system (Either?). Add error (type-error variable).~ (Added)
 - ~Check if update should have returns~ (Can, but not should)
 - ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
-- I may have to add the True/False tokens
+- ~I may have to add the True/False tokens~ (I did)
 - Should i have a possible If Then (without else)
 - Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans
