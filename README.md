@@ -1,6 +1,6 @@
 # HaskDice
 
-A DSL of dice rolls made in Haskell. Inspired by Troll language.
+A Deep EDSL of dice rolls made in Haskell. Inspired by Troll language.
 
 Build as a libre software. 
 
@@ -21,4 +21,4 @@ GNU General Public License v3.0
 Made by @ZimmSebas, with love <3
 
 
-This DSL, was made as my final proyect for the Programming language analysis subject
+This EDSL, was made as my final proyect for the Programming language analysis subject
