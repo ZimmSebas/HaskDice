@@ -1,0 +1,4 @@
+#!/bin/bash
+alex ./LexerParser/ALexer.x
+mv LexerParser/ALexer.hs Source/ALexer.hs
+ghci

@@ -60,6 +60,7 @@ It works! :D
 - ~Make a double-typed variable system (Either?). Add error (type-error variable).~ (Added)
 - ~Check if update should have returns~ (Can, but not should)
 - ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
+- I may have to add the True/False tokens
 - Should i have a possible If Then (without else)
 - Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans
