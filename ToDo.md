@@ -15,6 +15,7 @@
 - ~Test Eval with complicated cases~
 - ~Cry because i have to make a Lexer~
 - ~Lexer~
+- ~Test Lexer and Eval~ (Fixed many many many bugs)
 - Cry again, because i have to make a Parser (Work in progress)
 - Parser (Work in progress)
 - Add the file mode
@@ -52,7 +53,13 @@ It works! :D
 ## Lexer issues to solve
 
 - ~The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.~ (Now variables start with lowercase characters)
-- Needs extra testing with powerfull cases.
+- ~Needs extra testing with powerfull cases.~ (Tested all interactions, they all work!)
+
+It works! :D
+
+## Parser issues to solve
+
+- Start.
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
