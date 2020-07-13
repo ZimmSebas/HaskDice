@@ -12,9 +12,9 @@
 - ~Try TypeSystem~
 - ~Add a 'Pretty Print' system~
 - Modify ACCUM and REPUNT for better uses
-- Test Eval with complicated cases (Work in progress)
-- Cry because i have to make a Lexer (Work in progress)
-- Lexer
+- ~Test Eval with complicated cases~
+- ~Cry because i have to make a Lexer~
+- Lexer (Work in progress)
 - Cry again, because i have to make a Parser
 - Parser
 - Add the file and interactive mode
@@ -36,7 +36,7 @@ It works! :D
 
 ## TypeSystem idea (typetest branch ) (Done, added to master branch)
 
-- ~Add typing System~ :D
+- ~Add typing System~
 - ~Add typing Checks~ 
 - ~Improve typingValue. Add typingVar and typingCommand.~
 - ~Add a Enviroment of Type Variables. Maybe i need to change the monad for typing system.~ (New monad indeed)
@@ -47,6 +47,11 @@ It works! :D
 - ~Update eval~
 
 It works! :D
+
+## Lexer issues to solve
+
+- The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.
+- Needs extra testing with powerfull cases.
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)

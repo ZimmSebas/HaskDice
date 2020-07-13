@@ -1,3 +1,1 @@
-1 + 2 == 3
-b := true
-c := 25 ; max ([1,2,3] @@ [4,5])
+if (max bd) < (min Dia) then (sum 2D6) else (count 2D6) ; accum c := 2D6 until (count c) > 3 
