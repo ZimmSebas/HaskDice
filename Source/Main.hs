@@ -10,13 +10,21 @@ import RandomState
 import Eval
 import ALexer 
 import Prelude
+import System.Environment
+
+-- ~ main :: IO ()
+-- ~ main = do
+    -- ~ args <- getArgs
+    -- ~ case args of
+        -- ~ [] -> putStrLn "Error"
+        -- ~ (name:xs) -> execute name
 
 main :: IO ()
 main = do
-    args <- getArgs
-    execute args
+    execute "test.hkd"
 
 execute :: String -> IO ()
-execute file = do
-    let lexeado = ALexer.lexer file in
-    print lexeado
+execute name = do
+    file <- readFile $ "../Programs/" ++ name
+    let lexeado = (ALexer.lexer) file in
+        print lexeado
