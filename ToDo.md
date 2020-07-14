@@ -59,7 +59,8 @@ It works! :D
 
 ## Parser issues to solve
 
-- Start.
+- ~Start.~
+- I'm totally lost. Maybe i should read the documentation again. 
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
