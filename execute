@@ -1,5 +1,9 @@
 #!/bin/bash
-alex ./LexerParser/ALexer.x
+cd LexerParser
+alex ALexer.x
+happy SmilyParser.y
+cd ..
 mv LexerParser/ALexer.hs Source/ALexer.hs
+mv LexerParser/SmilyParser.hs Source/SmilyParser.hs
 cd Source
 ghci
