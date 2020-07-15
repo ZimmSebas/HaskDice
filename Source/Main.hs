@@ -9,6 +9,7 @@ import TypeEval
 import RandomState
 import Eval
 import ALexer 
+import SmilyParser
 import Prelude
 import System.Environment
 

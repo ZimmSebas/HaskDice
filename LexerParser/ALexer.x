@@ -53,73 +53,84 @@ tokens :-
     "repeat"                            { \pos str -> TokenRepeat pos }
     "until"                             { \pos str -> TokenUntil pos }
     $lower [$alpha $digit \_ \']*       { \pos str -> TokenName pos str}
-
+    "(<" $digit* ")"                    { \pos str -> TokenFopGt pos (read str)}
 
 {
-data Token = TokenLBrak       {position :: AlexPosn} -- [
-           | TokenRBrak       {position :: AlexPosn} -- ]
-           | TokenLet         {position :: AlexPosn} -- :=
-           | TokenAdd         {position :: AlexPosn} -- +
-           | TokenMinus       {position :: AlexPosn} -- -
-           | TokenTimes       {position :: AlexPosn} -- *
-           | TokenDiv         {position :: AlexPosn} -- /
-           | TokenMod         {position :: AlexPosn} -- %
-           | TokenSgn         {position :: AlexPosn} -- ~
-           | TokenIndep       {position :: AlexPosn} -- #
-           | TokenOpen        {position :: AlexPosn} -- (
-           | TokenClose       {position :: AlexPosn} -- )
-           | TokenComma       {position :: AlexPosn} -- ,
-           | TokenFopGt       {position :: AlexPosn}
-           | TokenFopLt       {position :: AlexPosn}
-           | TokenFopGEt      {position :: AlexPosn}
-           | TokenFopLEt      {position :: AlexPosn}
-           | TokenFopEq       {position :: AlexPosn}
-           | TokenFopNEq      {position :: AlexPosn}
-           | TokenD           {position :: AlexPosn}
-           | TokenZ           {position :: AlexPosn}
-           | TokenLeast       {position :: AlexPosn}
-           | TokenLargt       {position :: AlexPosn}
-           | TokenFilter      {position :: AlexPosn}
-           | TokenConcat      {position :: AlexPosn} -- @@
-           | TokenMax         {position :: AlexPosn}
-           | TokenMin         {position :: AlexPosn}
-           | TokenSum         {position :: AlexPosn}
-           | TokenCount       {position :: AlexPosn}
-           | TokenLt          {position :: AlexPosn} -- <
-           | TokenGt          {position :: AlexPosn} -- >
-           | TokenGEt         {position :: AlexPosn} -- >=
-           | TokenLEt         {position :: AlexPosn} -- <=
-           | TokenEq          {position :: AlexPosn} -- ==
-           | TokenNEq         {position :: AlexPosn} -- /=
-           | TokenAnd         {position :: AlexPosn} -- &&
-           | TokenOr          {position :: AlexPosn} -- ||
-           | TokenNot         {position :: AlexPosn} -- ¬
-           | TokenIsEmpty     {position :: AlexPosn}
-           | TokenSeq         {position :: AlexPosn} -- ;
-           | TokenIf          {position :: AlexPosn}
-           | TokenThen        {position :: AlexPosn}
-           | TokenElse        {position :: AlexPosn}
-           | TokenAccum       {position :: AlexPosn}
-           | TokenRepeat      {position :: AlexPosn}
-           | TokenUntil       {position :: AlexPosn}
-           | TokenTrue        {position :: AlexPosn}
-           | TokenFalse       {position :: AlexPosn}
-           | TokenInt         {position :: AlexPosn, value :: Int}
-           | TokenName        {position :: AlexPosn, text :: String}
+data Token = TokenLBrak       {pos :: AlexPosn} -- [
+           | TokenRBrak       {pos :: AlexPosn} -- ]
+           | TokenLet         {pos :: AlexPosn} -- :=
+           | TokenAdd         {pos :: AlexPosn} -- +
+           | TokenMinus       {pos :: AlexPosn} -- -
+           | TokenTimes       {pos :: AlexPosn} -- *
+           | TokenDiv         {pos :: AlexPosn} -- /
+           | TokenMod         {pos :: AlexPosn} -- %
+           | TokenSgn         {pos :: AlexPosn} -- ~
+           | TokenIndep       {pos :: AlexPosn} -- #
+           | TokenOpen        {pos :: AlexPosn} -- (
+           | TokenClose       {pos :: AlexPosn} -- )
+           | TokenComma       {pos :: AlexPosn} -- ,
+           | TokenFopGt       {pos :: AlexPosn, value :: Int}
+           | TokenFopLt       {pos :: AlexPosn, value :: Int}
+           | TokenFopGEt      {pos :: AlexPosn, value :: Int}
+           | TokenFopLEt      {pos :: AlexPosn, value :: Int}
+           | TokenFopEq       {pos :: AlexPosn, value :: Int}
+           | TokenFopNEq      {pos :: AlexPosn, value :: Int}
+           | TokenD           {pos :: AlexPosn}
+           | TokenZ           {pos :: AlexPosn}
+           | TokenLeast       {pos :: AlexPosn}
+           | TokenLargt       {pos :: AlexPosn}
+           | TokenFilter      {pos :: AlexPosn}
+           | TokenConcat      {pos :: AlexPosn} -- @@
+           | TokenMax         {pos :: AlexPosn}
+           | TokenMin         {pos :: AlexPosn}
+           | TokenSum         {pos :: AlexPosn}
+           | TokenCount       {pos :: AlexPosn}
+           | TokenLt          {pos :: AlexPosn} -- <
+           | TokenGt          {pos :: AlexPosn} -- >
+           | TokenGEt         {pos :: AlexPosn} -- >=
+           | TokenLEt         {pos :: AlexPosn} -- <=
+           | TokenEq          {pos :: AlexPosn} -- ==
+           | TokenNEq         {pos :: AlexPosn} -- /=
+           | TokenAnd         {pos :: AlexPosn} -- &&
+           | TokenOr          {pos :: AlexPosn} -- ||
+           | TokenNot         {pos :: AlexPosn} -- ¬
+           | TokenIsEmpty     {pos :: AlexPosn}
+           | TokenSeq         {pos :: AlexPosn} -- ;
+           | TokenIf          {pos :: AlexPosn}
+           | TokenThen        {pos :: AlexPosn}
+           | TokenElse        {pos :: AlexPosn}
+           | TokenAccum       {pos :: AlexPosn}
+           | TokenRepeat      {pos :: AlexPosn}
+           | TokenUntil       {pos :: AlexPosn}
+           | TokenTrue        {pos :: AlexPosn}
+           | TokenFalse       {pos :: AlexPosn}
+           | TokenInt         {pos :: AlexPosn, value :: Int}
+           | TokenName        {pos :: AlexPosn, text :: String}
  deriving (Eq, Show)
+
+
+
+tokenPos :: Token -> (Int, Int)
+tokenPos t = let (AlexPn v x y) = (pos t) in (x,y)
 
 lexer = alexScanTokens
 }
 
 --     Tokens i'll probably never use
---     | TokenBool        {position :: AlexPosn, valueB :: Bool}
---     | TokenCollection  {position :: AlexPosn, valueC :: [Int]}
---     | TokenINT         {position :: AlexPosn}
---     | TokenCOLL        {position :: AlexPosn}
---     | TokenBOOL        {position :: AlexPosn}
---     | TokenTInt        {position :: AlexPosn}
---     | TokenTBool       {position :: AlexPosn}
---     | TokenTColl       {position :: AlexPosn}
---     | TokenVar         {position :: AlexPosn}
---     | TokenExpr        {position :: AlexPosn}
+--     | TokenCollection  {pos :: AlexPosn, valueC :: [Int]}
+--     | TokenINT         {pos :: AlexPosn}
+--     | TokenCOLL        {pos :: AlexPosn}
+--     | TokenBOOL        {pos :: AlexPosn}
+--     | TokenTInt        {pos :: AlexPosn}
+--     | TokenTBool       {pos :: AlexPosn}
+--     | TokenTColl       {pos :: AlexPosn}
+--     | TokenVar         {pos :: AlexPosn}
+--     | TokenExpr        {pos :: AlexPosn}
+
+-- However i should make these ones
+--    $lower [$alpha $digit \_ \']*       { \pos str -> TokenFopGt pos str}
+--    $lower [$alpha $digit \_ \']*       { \pos str -> TokenFopLt pos str}
+--    $lower [$alpha $digit \_ \']*       { \pos str -> TokenFopGEt pos str}
+--    $lower [$alpha $digit \_ \']*       { \pos str -> TokenFop pos str}
+
        

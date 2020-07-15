@@ -16,7 +16,7 @@
 - ~Cry because i have to make a Lexer~
 - ~Lexer~
 - ~Test Lexer and Eval~ (Fixed many many many bugs)
-- Cry again, because i have to make a Parser (Work in progress)
+- ~Cry again, because i have to make a Parser~
 - Parser (Work in progress)
 - Add the file mode
 - Add the interactive mode
@@ -54,13 +54,18 @@ It works! :D
 
 - ~The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.~ (Now variables start with lowercase characters)
 - ~Needs extra testing with powerfull cases.~ (Tested all interactions, they all work!)
-
-It works! :D
+- The Collection Lexer needs improvement
 
 ## Parser issues to solve
 
 - ~Start.~
-- I'm totally lost. Maybe i should read the documentation again. 
+- The Collection parsing needs to be designed.
+- Happy works fine but the .hs is broken. Why? (Likely the combo Alex-Happy)
+
+## Minor Bugs
+
+- I need to make a type system to the Filter Operations
+- The Parser is getting bugs from AlexPosn
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
