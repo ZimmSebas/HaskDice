@@ -62,6 +62,15 @@ It works! :D
 - The Collection parsing needs to be designed.
 - Happy works fine but the .hs is broken. Why? (Likely the combo Alex-Happy)
 
+
+## Parser with Parsec
+
+- Maybe i need to change all the AST?
+- Parsing Collections (in a list way)
+- Parsing CollExpresion and BoolExpressions.
+- Parsing Commands.
+
+
 ## Minor Bugs
 
 - I need to make a type system to the Filter Operations
@@ -80,6 +89,7 @@ It works! :D
 - ~Check if update should have returns~ (Can, but not should)
 - ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
 - ~I may have to add the True/False tokens~ (I did)
+- Add while command
 - Should i have a possible If Then (without else)
 - Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans
