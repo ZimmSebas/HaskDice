@@ -104,37 +104,37 @@ instance Show FilOp where
 --              K   N
 
 data Expression a where 
-     D       :: Int -> Int -> Expression Collection
-     Z       :: Int -> Int -> Expression Collection
-     INT     :: Int -> Expression Int
-     COLL    :: Collection -> Expression Collection
-     BOOL    :: Bool -> Expression Bool
+     D       :: Int -> Int -> Expression c
+     Z       :: Int -> Int -> Expression c
+     INT     :: Int -> Expression n
+     COLL    :: Collection -> Expression c
+     BOOL    :: Bool -> Expression b
      Var     :: Variable -> Expression Value
-     Least   :: Int -> Expression a -> Expression Collection
-     Largt   :: Int -> Expression a -> Expression Collection
-     Filter  :: FilOp -> Expression a -> Expression Collection
-     Concat  :: Expression a -> Expression b -> Expression Collection
-     MAX     :: Expression a -> Expression Int
-     MIN     :: Expression a -> Expression Int
-     SUM     :: Expression a -> Expression Int
-     COUNT   :: Expression a -> Expression Int
-     ADD     :: Expression a -> Expression b -> Expression Int
-     MINUS   :: Expression a -> Expression b -> Expression Int
-     TIMES   :: Expression a -> Expression b -> Expression Int
-     DIV     :: Expression a -> Expression b -> Expression Int
-     MOD     :: Expression a -> Expression b -> Expression Int
-     UMINUS  :: Expression a -> Expression Int 
-     SGN     :: Expression a -> Expression Int
+     Least   :: Int -> Expression c1 -> Expression c2
+     Largt   :: Int -> Expression c1 -> Expression c2
+     Filter  :: FilOp -> Expression c1 -> Expression c2
+     Concat  :: Expression c1 -> Expression c2 -> Expression c3
+     MAX     :: Expression c -> Expression n
+     MIN     :: Expression c -> Expression n
+     SUM     :: Expression c -> Expression n
+     COUNT   :: Expression c -> Expression n
+     ADD     :: Expression x -> Expression y -> Expression n
+     MINUS   :: Expression x -> Expression y -> Expression n
+     TIMES   :: Expression x -> Expression y -> Expression n
+     DIV     :: Expression x -> Expression y -> Expression n
+     MOD     :: Expression x -> Expression y -> Expression n
+     UMINUS  :: Expression x -> Expression n 
+     SGN     :: Expression x -> Expression n
      INDEP   :: Expression a -> Expression b -> Expression Collection
-     Eq      :: Expression a -> Expression b -> Expression Bool
-     NEq     :: Expression a -> Expression b -> Expression Bool
-     Lt      :: Expression a -> Expression b -> Expression Bool
-     Gt      :: Expression a -> Expression b -> Expression Bool
-     GEt     :: Expression a -> Expression b -> Expression Bool
-     LEt     :: Expression a -> Expression b -> Expression Bool
-     AND     :: Expression a -> Expression b -> Expression Bool
-     OR      :: Expression a -> Expression b -> Expression Bool
-     NOT     :: Expression a -> Expression Bool
+     Eq      :: Expression x -> Expression y -> Expression b
+     NEq     :: Expression x -> Expression y -> Expression b
+     Lt      :: Expression x -> Expression y -> Expression b
+     Gt      :: Expression x -> Expression y -> Expression b
+     GEt     :: Expression x -> Expression y -> Expression b
+     LEt     :: Expression x -> Expression y -> Expression b
+     AND     :: Expression p -> Expression q -> Expression b
+     OR      :: Expression p -> Expression q -> Expression b
+     NOT     :: Expression p -> Expression b
      IsEmpty :: Value -> Expression Bool
  
 instance Show (Expression a) where
@@ -176,8 +176,8 @@ data Command a where
     Expr       :: Expression a -> Command a
     Let        :: Variable -> Expression a -> Command a
     Seq        :: Command a -> Command b -> Command b 
-    IfThenElse :: Expression Bool -> Command a -> Command b -> Command c  -- Need to destroy the 'Bool'
-    ACCUM      :: Command Collection -> Command a -> Command Collection    -- Accumulate e1 until e2(is empty)
+    IfThenElse :: Expression Bool -> Command a -> Command b -> Command c 
+    ACCUM      :: Command Collection -> Command a -> Command Collection 
     REPUNT     :: Command Collection -> Command a -> Command Collection
 
 instance Show (Command a) where

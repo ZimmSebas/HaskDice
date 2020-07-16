@@ -63,12 +63,17 @@ It works! :D
 - Happy works fine but the .hs is broken. Why? (Likely the combo Alex-Happy)
 
 
-## Parser with Parsec
+## Parser with Parsec (Parsec branch)
 
-- Maybe i need to change all the AST?
-- Parsing Collections (in a list way)
-- Parsing CollExpresion and BoolExpressions.
-- Parsing Commands.
+- ~Maybe i need to change all the AST?~ (Yup)
+- ~Parsing Collections (in a list way)~ 
+- ~Parsing Int Expressions~
+- ~Parsing Bool Expressions~
+- ~Parsing Commands~
+- Parsing CollExpresion 
+- Test more
+- Change the Expressions class and change all the repercutions
+
 
 
 ## Minor Bugs

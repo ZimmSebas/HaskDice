@@ -21,7 +21,7 @@ run name = do
     file <- readFile $ "../Programs/" ++ name
     case parseComm name file of
       Left error -> print error
-      Right t    -> do {print t ; print (eval g (Expr t)) } --imprimir sin evaluar (para testear Parser)
+      Right t    -> do {print t ; print (eval g t) } --imprimir sin evaluar (para testear Parser)
       -- ~ Right t    -> print (eval t) --imprimir el resultado de evaluar.
      
       

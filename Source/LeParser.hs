@@ -28,11 +28,11 @@ lis = makeTokenParser (emptyDef   { commentStart  = "/*"
                                 , reservedNames = ["true","false","if","then", "least", "largest", "filter", "accum", "repeat", "until",
                                                    "max", "min", "sum", "count", "else", "while", "D", "Z"] 
                                 , reservedOpNames = ["-", "+","*", "/", "~", "#", "%", "@@", 
-                                                     "==", "/=", "&&", "||", "<", ">", "<=", ">=", "¬", ";", ":="]                   
+                                                     "==", "/=", "&&", "||", "<", ">", "<=", ">=", ";", "¬", ":="]                   
                                 })
 
-----------------------------------
---- Common Parsers
+-----------------------------------
+--- Common Parsers ----------------
 -----------------------------------
 parenParse  :: Parser p -> Parser p
 parenParse p = do { symbol lis "("
@@ -44,10 +44,12 @@ intParse = do
     n <- integer lis
     return (fromInteger n :: Int)
 
+
                 
------------------------------------
---- intExpr parsers ---------------
------------------------------------                  
+-------------------------------------
+--- IntExps Parser ------------------
+-------------------------------------
+
 
 opParseTerm = do reservedOp lis "+"  
                  return (ADD) 
@@ -65,160 +67,182 @@ unaryParse = do { reservedOp lis "-"
                 ; b <- factorParse
                 ; return (SGN b) }
 
-intexp :: Parser (Expression Int)
+intexp :: Parser (Expression a)
 intexp  = do 
     f <- integer lis
     return $ INT (fromInteger f :: Int)
 
 
--- ~ intexp :: Parser (Expression a)
-intExprParse  = chainl1 termParse opParseTerm
-        
--- ~ termParse :: Parser (Expression a)
-termParse  = chainl1 factorParse opParseFactor
+opCollParse :: Parser (Expression a)
+opCollParse = do reserved lis "max"
+                 c <- collExprParse 
+                 return (MAX c)
+              <|> do reserved lis "min"
+                     c <- collExprParse 
+                     return (MIN c)
+              <|> do reserved lis "sum"
+                     c <- collExprParse 
+                     return (SUM c)
+              <|> do reserved lis "count"
+                     c <- collExprParse 
+                     return (COUNT c)
 
--- ~ factorParse :: Parser (Expression a)
+factorParse :: Parser (Expression a)
 factorParse  = unaryParse
              <|> try intexp
-             <|> parenParse intExprParse
+             <|> try (parenParse intExprParse)
+             <|> opCollParse
+
+
+termParse :: Parser (Expression a)
+termParse  = chainl1 factorParse opParseFactor
+
+intExprParse :: Parser (Expression a)
+intExprParse  = chainl1 termParse opParseTerm
+
+-------------------------------------
+--- CollExps Parser -----------------
+-------------------------------------
+
+diceParse :: Parser (Expression a) -- Bug, need a sepBy once. Doesn't work
+diceParse = do k <- intParse
+               reserved lis "D"
+               n <- intParse
+               return (D k n)
+            <|> do k <- intParse
+                   reserved lis "Z"
+                   n <- intParse
+                   return (Z k n)
+
+collParse :: Parser (Expression a)
+collParse = do
+    symbol lis "["
+    c <- sepBy1 intParse (symbol lis ",")
+    symbol lis "]"
+    return (COLL c)
+
+
+collExprParse :: Parser (Expression a)
+collExprParse = diceParse
+                <|> collParse
 
 -----------------------------------
---- intExpr parsers ---------------
------------------------------------                  
+--- BoolExps Parse ----------------
+-----------------------------------
+  
+boolPrimitive :: Parser (Expression a)
+boolPrimitive  = do { f <- reserved lis "true"; return (BOOL True) }
+               <|> do { f <- reserved lis "false"; return (BOOL False) }
 
 
-     -- ~ SUM     :: Expression a -> Expression Int
-     -- ~ COUNT   :: Expression a -> Expression Int
+compOpParse = do  { reservedOp lis "==" ; return (Eq) }
+              <|> do { reservedOp lis "/=" ; return (NEq) }
+              <|> do { reservedOp lis "<" ; return (Lt) }
+              <|> do { reservedOp lis ">" ; return (Gt) }
+              <|> do { reservedOp lis "<=" ; return (LEt) }
+              <|> do { reservedOp lis ">=" ; return (GEt) }
+
+boolOpParse = do  { reservedOp lis "&&" ; return (AND) }
+              <|> do { reservedOp lis "||" ; return (OR) }
+            
+negationParse :: Parser (Expression a)
+negationParse  = do { reservedOp lis "¬" 
+                  ; b <- bTermParse 
+                  ; return (NOT b) }
+
+comparisonParse :: Parser (Expression a)
+comparisonParse  = do { x <- intExprParse
+                    ; f <- compOpParse
+                    ; y <- intExprParse
+                    ; return (f x y)}
 
 
+boolParse :: Parser (Expression a)
+boolParse  = chainl1 bTermParse boolOpParse
+
+bTermParse :: Parser (Expression a)
+bTermParse  = negationParse
+            <|> try boolPrimitive
+            <|> try (parenParse boolParse)
+            <|> comparisonParse
+
+-------------------------------------
+--- General Expressions Parser ------
+-------------------------------------
 
 
--- ~ diceParse :: Parser (Expression a)
-diceParse = do
-    k <- intParse
-    reserved lis "D"
-    n <- intParse
-    return (D k n)
-    <|> do
-    k <- intParse
-    reserved lis "Z"
-    n <- intParse
-    return (Z k n)
-
--- ~ collParse = do
-    -- ~ symbol lis "["
-    -- ~ many1 do { x <- intParse <|> x <- intParse (symbol lis ",")}
-    -- ~ symbol lis "]"
-    
-    
-     -- ~ INT     :: Int -> Expression Int
-     -- ~ COLL    :: Collection -> Expression Collection
-     -- ~ BOOL    :: Bool -> Expression Bool
-     -- ~ Var     :: Variable -> Expression Value
-     -- ~ Least   :: Int -> Expression a -> Expression Collection
-     -- ~ Largt   :: Int -> Expression a -> Expression Collection
-     -- ~ Filter  :: FilOp -> Expression a -> Expression Collection
-     -- ~ Concat  :: Expression a -> Expression b -> Expression Collection
-     -- ~ MAX     :: Expression a -> Expression Int
-     -- ~ MIN     :: Expression a -> Expression Int
-     -- ~ INDEP   :: Expression a -> Expression b -> Expression Collection
-     -- ~ Eq      :: Expression a -> Expression b -> Expression Bool
-     -- ~ NEq     :: Expression a -> Expression b -> Expression Bool
-     -- ~ Lt      :: Expression a -> Expression b -> Expression Bool
-     -- ~ Gt      :: Expression a -> Expression b -> Expression Bool
-     -- ~ GEt     :: Expression a -> Expression b -> Expression Bool
-     -- ~ LEt     :: Expression a -> Expression b -> Expression Bool
-     -- ~ AND     :: Expression a -> Expression b -> Expression Bool
-     -- ~ OR      :: Expression a -> Expression b -> Expression Bool
-     -- ~ NOT     :: Expression a -> Expression Bool
-     -- ~ IsEmpty :: Value -> Expression Bool
-                    
-  
--- ~ varParse  = do x <- identifier lis
-               -- ~ return (Var x)
-  
-  
-  -- ~ -----------------------------------
-  -- ~ --- Parser de expressiones booleanas
-  -- ~ ------------------------------------
-  
-  -- ~ boolPrimitive :: Parser (Expression a)
-  -- ~ boolPrimitive  = do { f <- reserved lis "true"; return (BTrue) }
-                   -- ~ <|> do { f <- reserved lis "false"; return (BFalse) }
-  
-  -- ~ compOpParse = do  { reservedOp lis "==" ; return (Eq) }
-                -- ~ <|> do { reservedOp lis "!=" ; return (NEq) }
-                -- ~ <|> do { reservedOp lis "<" ; return (Lt) }
-                -- ~ <|> do { reservedOp lis ">" ; return (Gt) }
-  
-  -- ~ boolOpParse = do  { reservedOp lis "&&" ; return (And) }
-                -- ~ <|> do { reservedOp lis "||" ; return (Or) }
-                
-  -- ~ negationParse :: Parser (Expression a)
-  -- ~ negationParse  = do { reservedOp lis "¬" 
-                      -- ~ ; b <- bTermParse  -- ACA FALTA UN EQUIVALENTE A FACTOR
-                      -- ~ ; return (Not b) }
-  
-  -- ~ comparisonParse :: Parser (Expression a)
-  -- ~ comparisonParse  = do { x <- intexp
-                        -- ~ ; f <- compOpParse
-                        -- ~ ; y <- intexp
-                        -- ~ ; return (f x y)}
-  
-  
-  -- ~ boolexp :: Parser (Expression a)
-  -- ~ boolexp  = chainl1 bTermParse boolOpParse
-  
-  -- ~ bTermParse :: Parser (Expression a)
-  -- ~ bTermParse  = negationParse
-                -- ~ <|> try boolPrimitive
-                -- ~ <|> parenParse boolexp
-                -- ~ <|> comparisonParse
-  
-  -- ~ -----------------------------------
-  -- ~ --- Parser de comandos
-  -- ~ -----------------------------------
-  
-  -- ~ dacParse  = do  { reservedOp lis ";" ; return (Seq) }
-
-  
-  -- ~ letParse :: Parser (Command a)
-  -- ~ letParse  = do { name <- identifier lis
-                 -- ~ ; reservedOp lis "="
-                 -- ~ ; value <- intexp
-                 -- ~ ; return (Let name value)}
-                 
-  -- ~ ifParse :: Parser (Command a)
-  -- ~ ifParse  = do { reserved lis "if"
-                -- ~ ; cond <- boolexp
-                -- ~ ; reserved lis "then"
-                -- ~ ; symbol lis "{"
-                -- ~ ; thencmd <- comm
-                -- ~ ; symbol lis "}"
-                -- ~ ; elsecmd <- elseParse
-                -- ~ ; return (IfThenElse cond thencmd elsecmd)}
-                
-  -- ~ elseParse :: Parser (Command a)
-  -- ~ elseParse  = do { try (do { reserved lis "else"
-                            -- ~ ; symbol lis "{"
-                            -- ~ ; elsecmd <- comm
-                            -- ~ ; symbol lis "}"
-                            -- ~ ; return elsecmd}) }
-  
-
-  -- ~ commLine :: Parser (Command a)
-  -- ~ commLine  = ifParse
-              -- ~ <|> try letParse
+-- ~ varParse :: Parser (Expression a)
+-- ~ varParse = do name <- identifier lis
+              -- ~ return (Var name)
               
-  -- ~ comm :: Parser (Command a)
-  -- ~ comm = chainr1 commLine dacParse
+
+expParse :: Parser (Expression a)
+expParse = try collExprParse 
+           <|> try intExprParse
+           <|> boolParse
+           -- ~ <|> try varParse
+
+
+
+
+-------------------------------------
+--- Command Parser ------------------
+-------------------------------------
+
+dacParse :: Parser (Command a -> Command b -> Command b)
+dacParse  = do  { reservedOp lis ";" ; return (Seq) }                    
+  
+letParse :: Parser (Command a)
+letParse  = do reserved lis "let"
+               name <- identifier lis
+               reservedOp lis ":="
+               value <- expParse
+               return (Let name value)
+               
+exprParse = do e <- expParse
+               return (Expr e)
+                 
+ifElseParse :: Parser (Command a)
+ifElseParse  = do reserved lis "if"
+                  cond <- boolParse
+                  reserved lis "then"
+                  thencmd <- commParse
+                  reserved lis "else"
+                  elsecmd <- commParse
+                  return (IfThenElse cond thencmd elsecmd)
+
+commLine :: Parser (Command a)
+commLine  = ifElseParse
+          <|> letParse
+          <|> try exprParse
+          <|> parenParse commParse
+
+commParse :: Parser (Command a)
+commParse = chainr1 commLine dacParse
+
+-- ~ ifParse :: Parser (Command a)
+-- ~ ifParse  = do { reserved lis "if"
+            -- ~ ; cond <- exprParse
+            -- ~ ; reserved lis "then"
+            -- ~ ; thencmd <- commParse
+            -- ~ ; elsecmd <- elseParse
+            -- ~ ; return (IfThenElse cond thencmd elsecmd)}
+           
+-- ~ elseParse :: Parser (Command a)
+-- ~ elseParse  = do { try (do { reserved lis "else"
+                        -- ~ ; symbol lis "{"
+                        -- ~ ; elsecmd <- comm
+                        -- ~ ; symbol lis "}"
+                        -- ~ ; return elsecmd}) }
+  
+
   
   -- ~ ------------------------------------
   -- ~ -- Función de parseo
   -- ~ ------------------------------------
--- ~ parseComm :: SourceName -> String -> Either ParseError (Expression Int)
-parseComm :: SourceName -> String -> Either ParseError (Expression Int)
-parseComm = parse (totParser intExprParse)
+-- ~ parseComm :: SourceName -> String -> Either ParseError (Expression a)
+parseComm :: SourceName -> String -> Either ParseError (Command a)
+parseComm = parse (totParser commParse)
   
   
 
