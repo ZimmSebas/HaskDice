@@ -17,8 +17,10 @@
 - ~Lexer~
 - ~Test Lexer and Eval~ (Fixed many many many bugs)
 - ~Cry again, because i have to make a Parser~
-- Parser (Work in progress)
-- Add the file mode
+- ~Parser~ 
+- ~Add the file mode~
+- Test possible bugs
+- Improve the file reading mode
 - Add the interactive mode
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
@@ -50,19 +52,6 @@ It works! :D
 
 It works! :D
 
-## Lexer issues to solve
-
-- ~The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.~ (Now variables start with lowercase characters)
-- ~Needs extra testing with powerfull cases.~ (Tested all interactions, they all work!)
-- The Collection Lexer needs improvement
-
-## Parser issues to solve
-
-- ~Start.~
-- The Collection parsing needs to be designed.
-- Happy works fine but the .hs is broken. Why? (Likely the combo Alex-Happy)
-
-
 ## Parser with Parsec (Parsec branch)
 
 - ~Maybe i need to change all the AST?~ (Yup)
@@ -70,16 +59,16 @@ It works! :D
 - ~Parsing Int Expressions~
 - ~Parsing Bool Expressions~
 - ~Parsing Commands~
-- Parsing CollExpresion 
+- ~Parsing CollExpresion~ (Parser works! :D)
 - Test more
 - Change the Expressions class and change all the repercutions
 
 
 
-## Minor Bugs
+## Known errors
 
 - I need to make a type system to the Filter Operations
-- The Parser is getting bugs from AlexPosn
+- ~The Parser is getting bugs from AlexPosn~ (Changed to Parsec library)
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)

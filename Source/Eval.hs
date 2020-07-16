@@ -116,7 +116,7 @@ evalExp (SGN x) = do
 evalExp (INDEP n c) = do
             (I cant) <- evalExp n
             (C coll) <- evalExp c
-            if (cant > 0) then do {(C coll2) <- evalExp (INDEP (INT (cant-1)) c) ; return $ C (coll ++ coll2)}
+            if (cant > 1) then do {(C coll2) <- evalExp (INDEP (INT (cant-1)) c) ; return $ C (coll ++ coll2)}
                           else return (C coll)
 evalExp (BOOL b) = return (B b)
 evalExp (IsEmpty v) = do

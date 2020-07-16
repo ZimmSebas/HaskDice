@@ -109,7 +109,7 @@ data Expression a where
      INT     :: Int -> Expression n
      COLL    :: Collection -> Expression c
      BOOL    :: Bool -> Expression b
-     Var     :: Variable -> Expression Value
+     Var     :: Variable -> Expression v
      Least   :: Int -> Expression c1 -> Expression c2
      Largt   :: Int -> Expression c1 -> Expression c2
      Filter  :: FilOp -> Expression c1 -> Expression c2
@@ -125,7 +125,7 @@ data Expression a where
      MOD     :: Expression x -> Expression y -> Expression n
      UMINUS  :: Expression x -> Expression n 
      SGN     :: Expression x -> Expression n
-     INDEP   :: Expression a -> Expression b -> Expression Collection
+     INDEP   :: Expression n -> Expression c1 -> Expression c2
      Eq      :: Expression x -> Expression y -> Expression b
      NEq     :: Expression x -> Expression y -> Expression b
      Lt      :: Expression x -> Expression y -> Expression b
@@ -177,8 +177,8 @@ data Command a where
     Let        :: Variable -> Expression a -> Command a
     Seq        :: Command a -> Command b -> Command b 
     IfThenElse :: Expression Bool -> Command a -> Command b -> Command c 
-    ACCUM      :: Command Collection -> Command a -> Command Collection 
-    REPUNT     :: Command Collection -> Command a -> Command Collection
+    ACCUM      :: Command c1 -> Command v -> Command c2 
+    REPUNT     :: Command c1 -> Command v -> Command c2
 
 instance Show (Command a) where
     show (Expr e)             = show e
