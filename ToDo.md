@@ -17,7 +17,8 @@
 - ~Lexer~
 - ~Test Lexer and Eval~ (Fixed many many many bugs)
 - ~Cry again, because i have to make a Parser~
-- Parser (Work in progress)
+- Parser (On Hold)
+- Try the Parsec library. 
 - Add the file mode
 - Add the interactive mode
 - Add cabal package and command system
@@ -50,17 +51,20 @@ It works! :D
 
 It works! :D
 
-## Lexer issues to solve
+## Lexer issues to solve (On hold)
 
 - ~The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.~ (Now variables start with lowercase characters)
 - ~Needs extra testing with powerfull cases.~ (Tested all interactions, they all work!)
 - The Collection Lexer needs improvement
 
-## Parser issues to solve
+## Parser issues to solve (On hold)
 
 - ~Start.~
 - The Collection parsing needs to be designed.
 - Happy works fine but the .hs is broken. Why? (Likely the combo Alex-Happy)
+
+
+## Parser using Parsec branch
 
 ## Minor Bugs
 
