@@ -14,6 +14,13 @@ import System.Random
 
 main :: IO ()
 main = do
+    putStrLn "  _    _           _  _______   _                 "
+    putStrLn " | |  | |         | |/ /  __ \\ (_)               "
+    putStrLn " | |__| | __ _ ___| ' /| |  | | _  ___ ___        "
+    putStrLn " |  __  |/ _` / __|  < | |  | || |/ __/ _ \\      "
+    putStrLn " | |  | | (_| \\__ \\ . \\| |__| || | (_|  __/    "
+    putStrLn " |_|  |_|\\__,_|___/_|\\_\\_____/ |_|\\___\\___|  \n\n"
+   
     args <- getArgs
     case args of
         [] -> putStrLn "Error"

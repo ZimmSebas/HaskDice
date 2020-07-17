@@ -22,6 +22,7 @@
 - ~Change the Expression system~
 - ~Test possible bugs~ (Seems to work?)
 - ~Improve the file reading mode~ (Now can take program name as argument)
+- Make more Programs
 - Add the interactive mode
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
