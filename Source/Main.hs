@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -13,16 +12,12 @@ import Prelude
 import System.Environment
 import System.Random
 
--- ~ main :: IO ()
--- ~ main = do
-    -- ~ args <- getArgs
-    -- ~ case args of
-        -- ~ [] -> putStrLn "Error"
-        -- ~ (name:xs) -> execute name
-
 main :: IO ()
 main = do
-    execute "test.hkd"
+    args <- getArgs
+    case args of
+        [] -> putStrLn "Error"
+        (name:xs) -> execute name
 
 execute :: String -> IO ()
 execute name = do
@@ -30,4 +25,5 @@ execute name = do
     file <- readFile $ "../Programs/" ++ name
     case parseComm name file of
         Left error -> print error
-        Right t    -> do {print t ; print $ eval g t}
+        Right t    -> do (print $ eval g t)
+                         

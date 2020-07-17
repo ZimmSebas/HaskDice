@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -21,7 +20,7 @@ equalType t1 t2 e = if (t1 == t2) then return ()
                                   else throwTypingError t1 t2 e 
 
 -- Checks if in a binary operator that expects types t1/t2, the actual types are correct
-typingBinaryOp :: (MonadState m Type, MonadError m) => Type -> Expression a -> Type -> Expression b -> Type -> m Type
+typingBinaryOp :: (MonadState m Type, MonadError m) => Type -> Expression -> Type -> Expression -> Type -> m Type
 typingBinaryOp t1 e1 t2 e2 optype = do
     actt1 <- typingExp e1
     equalType t1 actt1 (show e1) 
@@ -30,14 +29,14 @@ typingBinaryOp t1 e1 t2 e2 optype = do
     return optype
 
 -- Checks if a unaryOp that expects type t1 has the actual type t1. 
-typingUnaryOp :: (MonadState m Type, MonadError m) => Type -> Expression a -> Type -> m Type
+typingUnaryOp :: (MonadState m Type, MonadError m) => Type -> Expression -> Type -> m Type
 typingUnaryOp typ exp untype = do
     acttyp <- typingExp exp
     equalType typ acttyp (show exp)
     return untype
 
 -- Checks if a unaryOp that expects type t1 has the actual type t1. 
-typingUnaryCommand :: (MonadState m Type, MonadError m) => Type -> Command a -> Type -> m Type
+typingUnaryCommand :: (MonadState m Type, MonadError m) => Type -> Command -> Type -> m Type
 typingUnaryCommand typ com untype = do
     acttyp <- typingCommand com
     equalType typ acttyp (show com)
@@ -51,7 +50,7 @@ typingValue (I _) = return TInt
 typingValue (B _) = return TBool
 
 -- Checks if type of arguments of an expression are correct, and returns the type of the expression
-typingExp :: (MonadState m Type, MonadError m) => Expression a -> m Type
+typingExp :: (MonadState m Type, MonadError m) => Expression -> m Type
 typingExp (D _ _)   = return TColl
 typingExp (Z _ _)   = return TColl
 typingExp (INT _)   = return TInt
@@ -90,7 +89,7 @@ typingExp (Var var) = do
     return t
 
 -- Takes a command, checks the type of the result and if some command has typing errors.
-typingCommand :: (MonadState m Type, MonadError m) => Command a -> m Type
+typingCommand :: (MonadState m Type, MonadError m) => Command -> m Type
 typingCommand (Expr e) = typingExp e
 typingCommand (Let v e) = do
         t <- typingExp e
@@ -120,7 +119,7 @@ typingCommand (REPUNT c1 c2) = do
 
 
 -- Check if a program is typed correctly
-evalType :: Command a -> Result Type
+evalType :: Command -> Result Type
 evalType exp = case (runTS (do { res <- typingCommand exp; return res}) initStateType) of
               Crash e      -> Crash e
               Return (t,_) -> Return t

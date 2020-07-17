@@ -19,14 +19,15 @@
 - ~Cry again, because i have to make a Parser~
 - ~Parser~ 
 - ~Add the file mode~
-- Test possible bugs
-- Improve the file reading mode
+- ~Change the Expression system~
+- ~Test possible bugs~ (Seems to work?)
+- ~Improve the file reading mode~ (Now can take program name as argument)
 - Add the interactive mode
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
 
 
-## GADT idea (GADT branch) (Done, added to master branch)
+## GADT idea (GADT branch) (Done, added to master branch. Then destroyed in Parsec branch)
 - ~Change AST to emulate a Generalized algebraic datatype (GADT)~ (GADT branch)
 - ~Change Eval to emulate the GADT AST~
 - ~Add BoolExp and EvalBoolExp~
@@ -60,16 +61,16 @@ It works! :D
 - ~Parsing Bool Expressions~
 - ~Parsing Commands~
 - ~Parsing CollExpresion~ (Parser works! :D)
-- Test more
-- Change the Expressions class and change all the repercutions
+- ~Test more~ (Seems to work?)
+- ~Change the Expressions class and change all the repercutions~
 
-
+It works!
 
 ## Known errors
 
-- I need to make a type system to the Filter Operations
+- ~I need to make a type system to the Filter Operations~ (Done)
 - ~The Parser is getting bugs from AlexPosn~ (Changed to Parsec library)
-- What happens if the numerical argument of least/largest exceeds the size?
+- ~What happens if the numerical argument of least/largest exceeds the size?~ (Add to the inform, takes all the list)
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
@@ -85,6 +86,10 @@ It works! :D
 - ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
 - ~I may have to add the True/False tokens~ (I did)
 - ~Research if double-typed variable is a issue in parser.~ (Fixed)
+
+### To add, maybe.
+
 - Should i have a possible If Then (without else)
 - Change the IfThenElse and Filter to use Booleans
-- Should i add functions?
+- Should i add function declaration?
+- 
