@@ -103,41 +103,41 @@ instance Show FilOp where
 -- C representa una tirada previamente evaluada (o sea, una colección)
 --              K   N
 
-data Expression a where 
-     D       :: Int -> Int -> Expression Collection
-     Z       :: Int -> Int -> Expression Collection
-     INT     :: Int -> Expression Int
-     COLL    :: Collection -> Expression Collection
-     BOOL    :: Bool -> Expression Bool
-     Var     :: Variable -> Expression Value
-     Least   :: Int -> Expression a -> Expression Collection
-     Largt   :: Int -> Expression a -> Expression Collection
-     Filter  :: FilOp -> Expression a -> Expression Collection
-     Concat  :: Expression a -> Expression b -> Expression Collection
-     MAX     :: Expression a -> Expression Int
-     MIN     :: Expression a -> Expression Int
-     SUM     :: Expression a -> Expression Int
-     COUNT   :: Expression a -> Expression Int
-     ADD     :: Expression a -> Expression b -> Expression Int
-     MINUS   :: Expression a -> Expression b -> Expression Int
-     TIMES   :: Expression a -> Expression b -> Expression Int
-     DIV     :: Expression a -> Expression b -> Expression Int
-     MOD     :: Expression a -> Expression b -> Expression Int
-     UMINUS  :: Expression a -> Expression Int 
-     SGN     :: Expression a -> Expression Int
-     INDEP   :: Expression a -> Expression b -> Expression Collection
-     Eq      :: Expression a -> Expression b -> Expression Bool
-     NEq     :: Expression a -> Expression b -> Expression Bool
-     Lt      :: Expression a -> Expression b -> Expression Bool
-     Gt      :: Expression a -> Expression b -> Expression Bool
-     GEt     :: Expression a -> Expression b -> Expression Bool
-     LEt     :: Expression a -> Expression b -> Expression Bool
-     AND     :: Expression a -> Expression b -> Expression Bool
-     OR      :: Expression a -> Expression b -> Expression Bool
-     NOT     :: Expression a -> Expression Bool
-     IsEmpty :: Value -> Expression Bool
+data Expression where 
+     D       :: Int -> Int -> Expression
+     Z       :: Int -> Int -> Expression
+     INT     :: Int -> Expression
+     COLL    :: Collection -> Expression
+     BOOL    :: Bool -> Expression
+     Var     :: Variable -> Expression
+     Least   :: Int -> Expression -> Expression 
+     Largt   :: Int -> Expression -> Expression 
+     Filter  :: FilOp -> Expression -> Expression
+     Concat  :: Expression -> Expression -> Expression
+     MAX     :: Expression -> Expression
+     MIN     :: Expression -> Expression
+     SUM     :: Expression -> Expression
+     COUNT   :: Expression -> Expression
+     ADD     :: Expression -> Expression -> Expression
+     MINUS   :: Expression -> Expression -> Expression
+     TIMES   :: Expression -> Expression -> Expression
+     DIV     :: Expression -> Expression -> Expression
+     MOD     :: Expression -> Expression -> Expression
+     UMINUS  :: Expression -> Expression 
+     SGN     :: Expression -> Expression
+     INDEP   :: Expression -> Expression -> Expression
+     Eq      :: Expression -> Expression -> Expression
+     NEq     :: Expression -> Expression -> Expression
+     Lt      :: Expression -> Expression -> Expression
+     Gt      :: Expression -> Expression -> Expression
+     GEt     :: Expression -> Expression -> Expression
+     LEt     :: Expression -> Expression -> Expression
+     AND     :: Expression -> Expression -> Expression
+     OR      :: Expression -> Expression -> Expression
+     NOT     :: Expression -> Expression
+     IsEmpty :: Value -> Expression
  
-instance Show (Expression a) where
+instance Show Expression where
     show (D k n)        = show k ++ "D" ++ show n 
     show (Z k n)        = show k ++ "Z" ++ show n
     show (INT i)        = show i
@@ -146,7 +146,7 @@ instance Show (Expression a) where
     show (Least i c)    = "least " ++ show i ++ " " ++ show c
     show (Largt i c)    = "largest " ++ show i ++ " " ++ show c
     show (Filter fop c) = "filter " ++ show fop ++ " " ++ show c
-    show (Concat c1 c2) = show c1 ++ " ++ " ++ show c2
+    show (Concat c1 c2) = show c1 ++ " @@ " ++ show c2
     show (MAX e)        = "max " ++ show e 
     show (MIN e)        = "min " ++ show e 
     show (SUM e)        = "sum " ++ show e 
@@ -172,18 +172,18 @@ instance Show (Expression a) where
     show (IsEmpty v)    = "is empty " ++ show v      
  
 -- Commands
-data Command a where
-    Expr       :: Expression a -> Command a
-    Let        :: Variable -> Expression a -> Command a
-    Seq        :: Command a -> Command b -> Command b 
-    IfThenElse :: Expression Bool -> Command a -> Command b -> Command c  -- Need to destroy the 'Bool'
-    ACCUM      :: Command Collection -> Command a -> Command Collection    -- Accumulate e1 until e2(is empty)
-    REPUNT     :: Command Collection -> Command a -> Command Collection
+data Command where
+    Expr       :: Expression -> Command
+    Let        :: Variable -> Expression -> Command
+    Seq        :: Command -> Command -> Command 
+    IfThenElse :: Expression -> Command -> Command -> Command 
+    ACCUM      :: Command -> Command -> Command 
+    REPUNT     :: Command -> Command -> Command
 
-instance Show (Command a) where
+instance Show Command where
     show (Expr e)             = show e
     show (Let v c)            = id v ++ " := " ++ show c
-    show (Seq c1 c2)          = show c1 ++ " ; " ++ show c2
+    show (Seq c1 c2)          = show c1 ++ ";\n" ++ show c2
     show (IfThenElse b c1 c2) = "if " ++ show b ++ " then " ++ show c1 ++ " else " ++ show c2
     show (ACCUM c1 c2)        = "accumulate " ++ show c1 ++ " until " ++ show c2 
     show (REPUNT c1 c2)       = "repeat " ++ show c1 ++ " until " ++ show c2

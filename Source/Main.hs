@@ -1,31 +1,29 @@
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Test where
+module Main where
 
 import AST
 import TypeEval
 import RandomState
 import Eval
-import ALexer 
-import SmilyParser
+import LeParser
 import Prelude
 import System.Environment
-
--- ~ main :: IO ()
--- ~ main = do
-    -- ~ args <- getArgs
-    -- ~ case args of
-        -- ~ [] -> putStrLn "Error"
-        -- ~ (name:xs) -> execute name
+import System.Random
 
 main :: IO ()
 main = do
-    execute "test.hkd"
+    args <- getArgs
+    case args of
+        [] -> putStrLn "Error"
+        (name:xs) -> execute name
 
 execute :: String -> IO ()
 execute name = do
+    g <- newStdGen
     file <- readFile $ "../Programs/" ++ name
-    let lexeado = (ALexer.lexer) file in
-        print lexeado
+    case parseComm name file of
+        Left error -> print error
+        Right t    -> do (print $ eval g t)
+                         

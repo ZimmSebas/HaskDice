@@ -17,15 +17,17 @@
 - ~Lexer~
 - ~Test Lexer and Eval~ (Fixed many many many bugs)
 - ~Cry again, because i have to make a Parser~
-- Parser (On Hold)
-- Try the Parsec library. 
-- Add the file mode
+- ~Parser~ 
+- ~Add the file mode~
+- ~Change the Expression system~
+- ~Test possible bugs~ (Seems to work?)
+- ~Improve the file reading mode~ (Now can take program name as argument)
 - Add the interactive mode
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
 
 
-## GADT idea (GADT branch) (Done, added to master branch)
+## GADT idea (GADT branch) (Done, added to master branch. Then destroyed in Parsec branch)
 - ~Change AST to emulate a Generalized algebraic datatype (GADT)~ (GADT branch)
 - ~Change Eval to emulate the GADT AST~
 - ~Add BoolExp and EvalBoolExp~
@@ -51,25 +53,25 @@ It works! :D
 
 It works! :D
 
-## Lexer issues to solve (On hold)
 
-- ~The 2D6 // 2Z6 system doesn't work. It takes 2 as number and "D6" as Variable. No idea how to solve it.~ (Now variables start with lowercase characters)
-- ~Needs extra testing with powerfull cases.~ (Tested all interactions, they all work!)
-- The Collection Lexer needs improvement
+## Parser with Parsec (Parsec branch)
 
-## Parser issues to solve (On hold)
+- ~Maybe i need to change all the AST?~ (Yup)
+- ~Parsing Collections (in a list way)~ 
+- ~Parsing Int Expressions~
+- ~Parsing Bool Expressions~
+- ~Parsing Commands~
+- ~Parsing CollExpresion~ (Parser works! :D)
+- ~Test more~ (Seems to work?)
+- ~Change the Expressions class and change all the repercutions~
 
-- ~Start.~
-- The Collection parsing needs to be designed.
-- Happy works fine but the .hs is broken. Why? (Likely the combo Alex-Happy)
+It works :D
 
+## Known errors
 
-## Parser using Parsec branch
-
-## Minor Bugs
-
-- I need to make a type system to the Filter Operations
-- The Parser is getting bugs from AlexPosn
+- ~I need to make a type system to the Filter Operations~ (Done)
+- ~The Parser is getting bugs from AlexPosn~ (Changed to Parsec library)
+- ~What happens if the numerical argument of least/largest exceeds the size?~ (Add to the inform, takes all the list)
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
@@ -84,7 +86,11 @@ It works! :D
 - ~Check if update should have returns~ (Can, but not should)
 - ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
 - ~I may have to add the True/False tokens~ (I did)
+- ~Research if double-typed variable is a issue in parser.~ (Fixed)
+
+### To add, maybe.
+
 - Should i have a possible If Then (without else)
-- Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans
-- Should i add functions?
+- Should i add function declaration?
+- 

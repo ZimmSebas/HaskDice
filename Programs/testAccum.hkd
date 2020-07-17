@@ -1,1 +1,2 @@
-repeat True until False
+accum x := 2D6 until (count x) > 0 
+// accum cd := 2D6 until ((count c) > 0) ; 

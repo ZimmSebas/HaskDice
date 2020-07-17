@@ -11,19 +11,11 @@ import System.Random
 import Prelude
 
 ---------------------------------------
------ Initial types and values --------
+----- Initial types -------------------
 ---------------------------------------
-
--- Initial State (Null)
-initState :: Env
-initState = [("v",(C [1,3]))]
 
 -- Variable State
 type Env = [(Variable,Value)]
-
-
-initStateType ::TypEnv
-initStateType = [("v",TColl)]
 
 -- Typing State of variable (for type eval)
 type TypEnv = [(Variable, Type)]
