@@ -2,16 +2,16 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Test where
+module Main where
 
 import AST
 import TypeEval
 import RandomState
 import Eval
-import ALexer 
-import SmilyParser
+import LeParser
 import Prelude
 import System.Environment
+import System.Random
 
 -- ~ main :: IO ()
 -- ~ main = do
@@ -26,6 +26,8 @@ main = do
 
 execute :: String -> IO ()
 execute name = do
+    g <- newStdGen
     file <- readFile $ "../Programs/" ++ name
-    let lexeado = (ALexer.lexer) file in
-        print lexeado
+    case parseComm name file of
+        Left error -> print error
+        Right t    -> do {print t ; print $ eval g t}

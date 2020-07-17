@@ -16,15 +16,17 @@ import Prelude
 
 
 ---------------------------------------
+----- Initial State -------------------
+---------------------------------------
+
+-- Initial State (Null)
+initState :: Env
+initState = []
+
+---------------------------------------
 ----- Evaluator -----------------------
 ---------------------------------------
 
-
--- Check if a program is typed correctly
-evalType :: Command a -> Result Type
-evalType exp = case (runTS (do { res <- typingCommand exp; return res}) initStateType) of
-              Crash e      -> Crash e
-              Return (t,_) -> Return t
 
 -- eval is the first function to be called, to eval the result that the main call upon.
 eval :: StdGen -> Command a -> Result (Value,Env)
@@ -34,8 +36,8 @@ eval gen exp = case evalType exp of
                             Crash e              -> Crash e
                             Return (val, st, sg) -> Return (val,st)
 
--- evalFiltOp eval an operator to the filter, and returns it in a function.
 
+-- evalFiltOp eval an operator to the filter, and returns it in a function.
 evalFiltOp :: FilOp -> (Int -> Bool)
 evalFiltOp (Grtth n)  = (>n)
 evalFiltOp (Lowth n)  = (<n)
@@ -44,7 +46,7 @@ evalFiltOp (LowEqt n) = (<=n)
 evalFiltOp (Equal n)  = (==n)
 evalFiltOp (NEqual n) = (/=n)
 
--- evalExp takes any kind of expression and returns the representation.
+-- evalExp takes any kind of expression and evaluates that expression, generating a Value.
 evalExp :: (MonadState m Value, MonadError m, MonadRandom m) => Expression a -> m Value
 evalExp (D k n) = do
     g' <- getStd
@@ -160,13 +162,8 @@ evalExp (NOT b) = do
         (B x) <- evalExp b
         return $ B (not x)
 
--- evalExp takes a Boolean expression and evaluates the result
 
-
--- eval Command takes a command and evaluates the changes in the state.
--- Eval Command returns a Value (Either Collection Int), based on what i had evalued.
--- La cosa es que el eval de commands va a devolver un Value. Entonces devuelve todo junto y que haya un comando Print que printee y listo. Ces't fini.
- 
+-- evalCommand takes a command and evaluates both the value and the changes in the state.
 evalCommand :: (MonadState m Value, MonadError m, MonadRandom m) => Command a -> m Value
 evalCommand (Expr exp) = do
             e <- evalExp exp
@@ -196,27 +193,19 @@ evalCommand (ACCUM (Let v c) exp) = do
             return (C list)
 
 
--- Voy a tener que implementar booleanos con los REPUNT y ACCUM. Ver cómo hacer eso.
 -- Definí un estandar de IsEmpty : Bool = False, Coll = [], Int = 0
 
 
-main = do  
+testEval = do  
     g <- newStdGen
     let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
     let typeres = evalType (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
-    -- ~ print res
-    -- ~ print typeres
     
     let test1 = eval g (Let "x" (COLL [1,2,3]))
     let typetest1 = evalType (Let "x" (COLL [1,2,3]))
-    -- ~ print test1
-    -- ~ print typetest1
-    
     
     let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
     let typetest2 = evalType (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
-    -- ~ print test2
-    -- ~ print typetest2
 
     let test3 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     let typetest3 = evalType (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
@@ -228,28 +217,14 @@ main = do
     let testdivZero = eval g (Expr (DIV (SUM (D 1 6)) (INT 0)) )
     let testmodZero = eval g (Expr (MOD (SUM (D 1 6)) (INT 0)) )
     let testnodVar  = eval g (Expr (ADD (Var "b") (INT 0)) )
-    -- ~ let test7 = eval g (ACCUM (Let "a" (D 1 6)) (Expr (BOOL False)))
-    -- ~ let test7 = eval g (ACCUM (Let "a" (D 1 6)) (Expr (Gt (MAX (Var "a")) (INT 3))))
     let testgreater = eval g (ACCUM (Let "a" (D 1 6)) (Expr (Gt (MAX (Var "a")) (INT 3))))
     let test8 = eval g (REPUNT (Let "a" (D 1 6)) (Expr (Eq (MAX (Var "a")) (INT 6))))
     
-        
-    -- ~ print test3
-    -- ~ print typetest3
-    -- ~ print "test 4: "
-    -- ~ print test4
-    -- ~ print "test 5: "
-    -- ~ print test5
-    -- ~ print "test 6: "
-    -- ~ print test6
-
     print "test greater"
     print testgreater
     print "test 8: "
     print test8
 
-
-
-    -- ~ print testdivZero 
-    -- ~ print testmodZero 
-    -- ~ print testnodVar  
+    print testdivZero 
+    print testmodZero 
+    print testnodVar  

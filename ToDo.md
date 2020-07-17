@@ -69,6 +69,7 @@ It works! :D
 
 - I need to make a type system to the Filter Operations
 - ~The Parser is getting bugs from AlexPosn~ (Changed to Parsec library)
+- What happens if the numerical argument of least/largest exceeds the size?
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
@@ -83,8 +84,7 @@ It works! :D
 - ~Check if update should have returns~ (Can, but not should)
 - ~Check if assign is needed (as a eval issue, not only as a command. Probably, yes).~ (Seems not)
 - ~I may have to add the True/False tokens~ (I did)
-- Add while command
+- ~Research if double-typed variable is a issue in parser.~ (Fixed)
 - Should i have a possible If Then (without else)
-- Research if double-typed variable is a issue in parser.
 - Change the IfThenElse and Filter to use Booleans
 - Should i add functions?

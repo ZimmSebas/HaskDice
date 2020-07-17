@@ -1,8 +1,16 @@
 let c := 2D6 ;
 if max [1,2] < (min [1,2]) then (sum 2D6) else (count 2D6) ;
 ¬True && False ;
-2/3 * 15 % 4 + 3 - 5 + (-6) ;
+2/3 * 15 % 4 + 3 - 5 + -6 ;
 True || True ;
 filter (<=4) [1,2,3,4,5,6] ;
-(accum cd := 2D6 until True ); 
-(sum 1D4) # 1D6 
+accum cd := 2D6 until (count cd > 1 ; count cd > 1) ;
+(sum 1D4) # 1D6 ;
+least 2 [1,2,3,4] ; 
+largest 2 [1,2,3,4] ;
+filter (== 3) [1,2,3,4] ; 
+1 + -2 ;
+least 2 [1,2,3,4] @@ largest 2 [1,2,3,4] 
+
+
+

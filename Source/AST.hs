@@ -183,7 +183,7 @@ data Command a where
 instance Show (Command a) where
     show (Expr e)             = show e
     show (Let v c)            = id v ++ " := " ++ show c
-    show (Seq c1 c2)          = show c1 ++ " ; " ++ show c2
+    show (Seq c1 c2)          = show c1 ++ ";\n" ++ show c2
     show (IfThenElse b c1 c2) = "if " ++ show b ++ " then " ++ show c1 ++ " else " ++ show c2
     show (ACCUM c1 c2)        = "accumulate " ++ show c1 ++ " until " ++ show c2 
     show (REPUNT c1 c2)       = "repeat " ++ show c1 ++ " until " ++ show c2

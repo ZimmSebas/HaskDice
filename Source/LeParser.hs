@@ -284,14 +284,14 @@ recursiveCommParse = do reserved lis "repeat"
                         reserved lis ":="
                         value <- expParse
                         reserved lis "until"
-                        c <- commParse
+                        c <- commLine
                         return (REPUNT (Let name value) c)
                      <|> do reserved lis "accum"
                             name <- identifier lis
                             reserved lis ":="
                             value <- expParse
                             reserved lis "until"
-                            c <- commParse
+                            c <- commLine
                             return (ACCUM (Let name value) c)
 
 
