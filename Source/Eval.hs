@@ -28,12 +28,12 @@ initState = []
 
 
 -- eval is the first function to be called, to eval the result that the main call upon.
-eval :: StdGen -> Env -> Command -> Result (Value,Env,StdGen)
-eval gen state exp = case evalType exp of
+eval :: StdGen -> Env -> Command -> Result EvalResult
+eval gen state exp = case evalType exp state of
                           Crash e     -> Crash e
                           Return _    -> case (runRS (do {res <- evalCommand exp; return res}) state gen) of
-                                              Crash e              -> Crash e
-                                              Return (val, st, sg) -> Return (val,st,sg)
+                                              Crash e   -> Crash e
+                                              Return eres -> Return (ER eres)
 
 
 -- evalFiltOp eval an operator to the filter, and returns it in a function.

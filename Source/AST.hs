@@ -3,6 +3,11 @@
 module AST where
 
 import Prelude
+import System.Random 
+
+---------------------------------------
+----- Initial types -------------------
+---------------------------------------
 
 -- Collections
 type Collection = [Int]
@@ -20,6 +25,19 @@ instance Show Value where
     show (C c) = show c
     show (I i) = show i
     show (B b) = show b
+
+-- Variable State
+type Env = [(Variable,Value)]
+
+-- Typing State of variable (for type eval)
+type TypEnv = [(Variable, Type)]
+
+-- Result of an Eval (for instance show purposes)
+data EvalResult = ER (Value, Env, StdGen)
+
+instance Show EvalResult where
+    show (ER (val,st,stdg)) = "Result: " ++ show val ++ "\nVariables: " ++ show st ++ "\n"
+ 
  
 -- Possible errors that the program may have
 data Error = TypingError Type Type String

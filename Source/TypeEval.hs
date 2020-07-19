@@ -12,6 +12,15 @@ import System.Random
 initStateType ::TypEnv
 initStateType = []
 
+-- Takes a variable and transforms and returns the type (with the name of the variable)
+varToType :: (Variable,Value) -> (Variable,Type)
+varToType (str,(C _)) = (str,TColl)
+varToType (str,(I _)) = (str,TInt)
+varToType (str,(B _)) = (str,TBool)
+
+-- Mapfunction to map an enviroment of variables and returns the type.
+mapingTypeEnv :: Env -> TypEnv
+mapingTypeEnv state = map varToType state
 
 
 -- Checks if two types are equal
@@ -119,7 +128,7 @@ typingCommand (REPUNT c1 c2) = do
 
 
 -- Check if a program is typed correctly
-evalType :: Command -> Result Type
-evalType exp = case (runTS (do { res <- typingCommand exp; return res}) initStateType) of
+evalType :: Command -> Env -> Result Type
+evalType exp st = case (runTS (do { res <- typingCommand exp; return res}) (mapingTypeEnv st)) of
               Crash e      -> Crash e
               Return (t,_) -> Return t

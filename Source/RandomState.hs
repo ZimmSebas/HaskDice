@@ -10,15 +10,7 @@ import System.IO
 import System.Random 
 import Prelude
 
----------------------------------------
------ Initial types -------------------
----------------------------------------
 
--- Variable State
-type Env = [(Variable,Value)]
-
--- Typing State of variable (for type eval)
-type TypEnv = [(Variable, Type)]
 
 ---------------------------------------
 ----- Random State Monad --------------

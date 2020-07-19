@@ -4,6 +4,7 @@
 module Main where
 
 import Control.Exception (catch,IOException)
+import System.IO.Error (catchIOError)
 -- ~ import Control.Monad.Except
 import System.Console.Readline (readline)
 
@@ -42,31 +43,35 @@ haskdicelogo = do
     putStrLn " | |  | | (_| \\__ \\ . \\| |__| || | (_|  __/    "
     putStrLn " |_|  |_|\\__,_|___/_|\\_\\_____/ |_|\\___\\___|  \n\n"
 
-iprompt, iname :: String
-iprompt = "HkD>"
-iname   = "HasKDice"
+iprompt :: String
+iprompt = "HkD> "
 
-data State = S { inter :: Bool,      -- True, si estamos en modo interactivo.
-               lfile :: String,      -- Ultimo archivo cargado (para hacer "reload")
-               env :: Env,           -- Entorno con variables globales y su valor  [(Name, (Value, Type))]
-               stdg :: StdGen        -- Generador de números aleatorios
+ioExceptionCatcher :: IOException -> IO (Maybe a)
+ioExceptionCatcher _ = return Nothing
+
+
+data State = S { inter :: Bool,      -- True, if interactive mode
+               lfile :: String,      -- Last file loaded (to "reload")
+               env :: Env,           -- Enviroment with variables and values  [Variable,Value]
+               stdg :: StdGen        -- Random number generator
              }
 
 
 interactiveMode :: [String] -> IO ()
 interactiveMode []        = do
-        putStrLn "\nWelcome to:"
         haskdicelogo
         g <- newStdGen
-        readevalprint g []
+        readevalprint g [] -- "infinite" loop with random number generator + empty state (no variables yet)
 
 readevalprint :: StdGen -> Env -> IO ()
-readevalprint g st = do maybeline <- readline iprompt
+readevalprint g st = do maybeline <- catch (readline iprompt) ioExceptionCatcher
                         case maybeline of
-                             Nothing -> print "Error reading something?"
-                             Just line -> case (parseInt line) of
-                                               (Left e) -> do {print e; readevalprint g st}
-                                               (Right res) -> case eval g st res of -- make case in parseInt
-                                                                   Crash e                     -> do {print e ; readevalprint g st} 
-                                                                   Return (value, state, stdg) -> do {print (Return (value,state)) ; readevalprint stdg state}
+                             Nothing     -> print "Error reading something?"
+                             Just ""     -> readevalprint g st
+                             Just "exit" -> print "Goodbye! Have fun!"
+                             Just line   -> case (parseInt line) of
+                                                 (Left e) -> do {print e; readevalprint g st}
+                                                 (Right res) -> case eval g st res of 
+                                                                     Crash e                     -> do {print e ; readevalprint g st} 
+                                                                     Return reval@(ER (value, state, stdg)) -> do {print reval ; readevalprint stdg state}
                                                 

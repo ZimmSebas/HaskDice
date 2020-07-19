@@ -23,10 +23,12 @@
 - ~Test possible bugs~ (Seems to work?)
 - ~Improve the file reading mode~ (Now can take program name as argument)
 - ~Change the eval so i can use it in a interactive way~
-- I need to add the variables that already exists to the variable state
-- Change the print of eval, now it prints the random number generator, let's try so that it doesn't. I can do it with declaring a type and a show instance.
+- ~I need to add the variables that already exists to the variable state~
+- ~Add the interactive mode~
+- ~Change the print of eval, now it prints the random number generator, let's try so that it doesn't. I can do it with declaring a type and a show instance.~
+- Need to change the Parser. Needs to be less strict so the TypeEval can solve the problems. (Sad D:)
 - Make more Programs (Working on it)
-- Add the interactive mode (Working on it - almost theeeere)
+- Update the interactive mode (commands)
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
 
