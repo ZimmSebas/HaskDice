@@ -1,0 +1,1 @@
+let b := 2D6 ; if (max b) == (min b) then b@@b else b 

@@ -1,0 +1,8 @@
+let player1 := 6D6 ; let player2 := 6D6 ; 
+let d1 := count (filter (==1) player1 @@ filter (==1) player2) ;
+let d2 := count (filter (==2) player1 @@ filter (==2) player2) ;
+let d3 := count (filter (==3) player1 @@ filter (==3) player2) ;
+let d4 := count (filter (==4) player1 @@ filter (==4) player2) ;
+let d5 := count (filter (==5) player1 @@ filter (==5) player2) ;
+let d6 := count (filter (==6) player1 @@ filter (==6) player2) 
+

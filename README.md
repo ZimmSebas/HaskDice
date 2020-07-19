@@ -9,8 +9,6 @@ Build as a libre software.
 ## Prerequisites
 
 - Haskell
-- [Alex](https://www.haskell.org/alex/)
-- [Happy](https://www.haskell.org/happy/)
 
 ## License
 

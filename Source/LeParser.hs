@@ -11,6 +11,8 @@ import Data.Maybe
 --- Token analizer and Total Parser ------------
 ------------------------------------------------
 
+type ParseResult = Either ParseError Command
+
 totParser :: Parser a -> Parser a
 totParser p = do 
                 whiteSpace lis
@@ -328,8 +330,11 @@ commParse = chainr1 commLine dacParse
 -- Función de parseo
 ------------------------------------
 
-parseComm :: SourceName -> String -> Either ParseError Command
-parseComm = parse (totParser commParse)
-  
+parseFile :: SourceName -> String -> ParseResult
+parseFile = parse (totParser commParse)
+
+parseInt :: String -> ParseResult
+parseInt s = parse (totParser commParse) "" s
+
   
 

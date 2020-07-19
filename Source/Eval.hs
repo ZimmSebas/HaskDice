@@ -28,12 +28,12 @@ initState = []
 
 
 -- eval is the first function to be called, to eval the result that the main call upon.
-eval :: StdGen -> Command -> Result (Value,Env)
-eval gen exp = case evalType exp of
-                    Crash e     -> Crash e
-                    Return _    -> case (runRS (do {res <- evalCommand exp; return res}) initState gen) of
-                            Crash e              -> Crash e
-                            Return (val, st, sg) -> Return (val,st)
+eval :: StdGen -> Env -> Command -> Result (Value,Env,StdGen)
+eval gen state exp = case evalType exp of
+                          Crash e     -> Crash e
+                          Return _    -> case (runRS (do {res <- evalCommand exp; return res}) state gen) of
+                                              Crash e              -> Crash e
+                                              Return (val, st, sg) -> Return (val,st,sg)
 
 
 -- evalFiltOp eval an operator to the filter, and returns it in a function.
@@ -197,27 +197,27 @@ evalCommand (ACCUM (Let v c) exp) = do
 
 testEval = do  
     g <- newStdGen
-    let res = eval g (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
+    let res = eval g [] (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
     let typeres = evalType (Expr (Filter (GrtEqt 3) (Largt 3 (D 5 8)) ))
     
-    let test1 = eval g (Let "x" (COLL [1,2,3]))
+    let test1 = eval g [] (Let "x" (COLL [1,2,3]))
     let typetest1 = evalType (Let "x" (COLL [1,2,3]))
     
-    let test2 = eval g (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
+    let test2 = eval g [] (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
     let typetest2 = evalType (IfThenElse (IsEmpty (C [])) (Expr (D 1 6)) (Expr (Z 1 8)))
 
-    let test3 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let test3 = eval g [] (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     let typetest3 = evalType (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (Var "b")) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
-    let test4 = eval g (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (INT 2)) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
+    let test4 = eval g [] (Seq (Let "b" (D 2 6)) (IfThenElse (Eq (MAX (INT 2)) (MIN (Var "b"))) (Expr (Concat (Var "b") (Var "b"))) (Expr (Var "b"))))
     
-    let test5 = eval g (ACCUM (Let "b" (D 2 6)) (Expr (Eq (MAX (INT 2)) (MIN (Var "b"))))  )
-    let test6 = eval g (Seq (Let "a" (D 1 6)) (Seq (Let "b" (D 1 6)) (Seq (Let "c" (D 1 6)) (Let "d" (D 1 6)) ) ) )
-    let testdivZero = eval g (Expr (DIV (SUM (D 1 6)) (INT 0)) )
-    let testmodZero = eval g (Expr (MOD (SUM (D 1 6)) (INT 0)) )
-    let testnodVar  = eval g (Expr (ADD (Var "b") (INT 0)) )
-    let testgreater = eval g (ACCUM (Let "a" (D 1 6)) (Expr (Gt (MAX (Var "a")) (INT 3))))
-    let test8 = eval g (REPUNT (Let "a" (D 1 6)) (Expr (Eq (MAX (Var "a")) (INT 6))))
+    let test5 = eval g [] (ACCUM (Let "b" (D 2 6)) (Expr (Eq (MAX (INT 2)) (MIN (Var "b"))))  )
+    let test6 = eval g [] (Seq (Let "a" (D 1 6)) (Seq (Let "b" (D 1 6)) (Seq (Let "c" (D 1 6)) (Let "d" (D 1 6)) ) ) )
+    let testdivZero = eval g [] (Expr (DIV (SUM (D 1 6)) (INT 0)) )
+    let testmodZero = eval g [](Expr (MOD (SUM (D 1 6)) (INT 0)) )
+    let testnodVar  = eval g [](Expr (ADD (Var "b") (INT 0)) )
+    let testgreater = eval g [](ACCUM (Let "a" (D 1 6)) (Expr (Gt (MAX (Var "a")) (INT 3))))
+    let test8 = eval g [](REPUNT (Let "a" (D 1 6)) (Expr (Eq (MAX (Var "a")) (INT 6))))
     
     print "test greater"
     print testgreater
