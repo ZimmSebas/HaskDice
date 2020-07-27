@@ -1,7 +1,7 @@
 let laura := sum (1D20) + 12 ;
-let juan := max(2D20)+8 ;
-let jorge := sum 1D20 + 10 ;
-let ana := min(1D20)+8 ;
-let zombie1 := max(2D20)+4 ;
-let zombie2 := max(2D20)+4 ;
-let zombie3 := max 2D20 + 4
+let juan := max 2D20 +8 ;
+let jorge := sum 3D20 + 10 ;
+let ana := min 4D20 +8 ;
+let zombie1 := max 5D20 +4 ;
+let zombie2 := max 6D20 +4 ;
+let zombie3 := max 7D20 + 4

@@ -1,2 +1,2 @@
-accum x := 2D6 until (count x) > 0 
-// accum cd := 2D6 until ((count c) > 0) ; 
+accum x := 2D6 until (sum x) > 10 
+-- accum cd := 2D6 until ((count c) > 0) ; 

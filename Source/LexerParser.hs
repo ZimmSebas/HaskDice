@@ -1,8 +1,9 @@
-module LeParser where
+module LexerParser where
 
 import Text.ParserCombinators.Parsec
 import Text.Parsec.Token
 import Text.Parsec.Language (emptyDef)
+import Text.Parsec.Error 
 import AST
 import Data.Char
 import Data.Maybe
@@ -12,6 +13,11 @@ import Data.Maybe
 ------------------------------------------------
 
 type ParseResult = Either ParseError Command
+
+-- ~ instance Show ParseResult where
+    -- ~ show (Left e) = "YOU SHALL NOT PARSE \n" ++ show e -- Yes, this was the only reason.
+    -- ~ show (Right c) = show c
+
 
 totParser :: Parser a -> Parser a
 totParser p = do 
@@ -38,10 +44,10 @@ lis = makeTokenParser (emptyDef   { commentStart  = "{-"
 --- Common Parsers ----------------
 -----------------------------------
 parenParse  :: Parser p -> Parser p
-parenParse p = do { symbol lis "("
-                ; x <- p
-                ; symbol lis ")"
-                ; return x }
+parenParse p = do symbol lis "("
+                  x <- p
+                  symbol lis ")"
+                  return x 
 
 intParse = do
     n <- integer lis
@@ -80,64 +86,6 @@ intexp  = do
     f <- integer lis
     return $ INT (fromInteger f :: Int)
 
-
-opCollIntParse :: Parser Expression
-opCollIntParse = do reserved lis "max"
-                    c <- collExprParse 
-                    return (MAX c)
-                 <|> do reserved lis "min"
-                        c <- collExprParse 
-                        return (MIN c)
-                 <|> do reserved lis "sum"
-                        c <- collExprParse 
-                        return (SUM c)
-                 <|> do reserved lis "count"
-                        c <- collExprParse 
-                        return (COUNT c)
-
-factorParse :: Parser Expression
-factorParse  = unaryParse
-             <|> try intexp
-             <|> try (parenParse intExprParse)
-             <|> opCollIntParse
-             <|> try varParse
-
-
-termParse :: Parser Expression
-termParse  = chainl1 factorParse opParseFactor
-
-intExprParse :: Parser Expression 
-intExprParse  = chainl1 termParse opParseTerm
-
--------------------------------------
---- CollExps Parser -----------------
--------------------------------------
-
-diceParse :: Parser Expression 
-diceParse = do k <- intParse
-               reservedOp lis "D"
-               n <- intParse
-               return (D k n)
-            <|> do k <- intParse
-                   reservedOp lis "Z"
-                   n <- intParse
-                   return (Z k n)
-
-collParse :: Parser Expression
-collParse = do
-    symbol lis "["
-    c <- sepBy1 intParse (symbol lis ",")
-    symbol lis "]"
-    return (COLL c)
-
-concatParse =  do reservedOp lis "@@"
-                  return (Concat) 
-
-indepParse = do { try (do n <- intExprParse
-                          reservedOp lis "#"
-                          c <- collExprParse
-                          return (INDEP n c)) }    
-
 filOpParse :: Parser FilOp
 filOpParse = try (do symbol lis "("
                      symbol lis ">"
@@ -173,33 +121,95 @@ filOpParse = try (do symbol lis "("
                          n <- intParse
                          symbol lis ")"
                          return (NEqual n) ) 
-                   
-opCollCollParse :: Parser Expression
-opCollCollParse = do reserved lis "least"
+
+opCollParse :: Parser Expression
+opCollParse = do reserved lis "max"
+                 e <- collTermParse 
+                 return (MAX e)
+              <|> do reserved lis "min"
+                     e <- collTermParse 
+                     return (MIN e)
+              <|> do reserved lis "sum"
+                     e <- collTermParse 
+                     return (SUM e)
+              <|> do reserved lis "count"
+                     e <- collTermParse 
+                     return (COUNT e)
+              <|> do reserved lis "least"
                      n <- intParse
                      c <- collTermParse
                      return (Least n c)
-                  <|> do reserved lis "largest"
-                         n <- intParse
-                         c <- collTermParse
-                         return (Largt n c)
-                  <|> do reserved lis "filter"
-                         fop <- filOpParse
-                         c <- collTermParse
-                         return (Filter fop c)        
-                         
+              <|> do reserved lis "largest"
+                     n <- intParse
+                     c <- collTermParse
+                     return (Largt n c)
+              <|> do reserved lis "filter"
+                     fop <- filOpParse
+                     c <- collTermParse
+                     return (Filter fop c)  
 
+
+factorParse :: Parser Expression
+factorParse  = unaryParse
+             <|> try varParse
+             <|> try intexp
+             <|> try opCollParse
+             <|> try (parenParse intExprParse)
+
+termParse :: Parser Expression
+termParse  = chainl1 factorParse opParseFactor
+
+intExprParse :: Parser Expression 
+intExprParse  = chainl1 termParse opParseTerm
+
+-------------------------------------
+--- CollExps Parser -----------------
+-------------------------------------
+
+diceBinopParse = do { reservedOp lis "D" ; return (D) }
+                 <|> do { reservedOp lis "d" ; return (D) }
+                 <|> do { reservedOp lis "Z" ; return (Z) }
+                 <|> do { reservedOp lis "z" ; return (Z) }
+
+diceParse :: Parser Expression 
+diceParse = do k <- intParse
+               op <- diceBinopParse
+               n <- intParse
+               return (op k n)
+            -- ~ <|> do k <- intParse
+                   -- ~ reservedOp lis "Z"
+                   -- ~ n <- intParse
+                   -- ~ return (Z k n)
+
+collParse :: Parser Expression
+collParse = do
+    symbol lis "["
+    c <- sepBy1 intParse (symbol lis ",")
+    symbol lis "]"
+    return (COLL c)
+
+-- ~ concatParse =  do reservedOp lis "@@"
+                  -- ~ return (Concat) 
+
+-- ~ indepParse = do { try (do n <- intExprParse
+                          -- ~ reservedOp lis "#"
+                          -- ~ c <- collExprParse
+                          -- ~ return (INDEP n c)) }    
+
+binopCollParse = do reservedOp lis "@@"
+                    return (Concat)
+                 <|> do reservedOp lis "#"
+                        return (INDEP)
+      
 
 collTermParse :: Parser Expression
-collTermParse = diceParse
-                <|> collParse
-                <|> indepParse
-                <|> opCollCollParse
+collTermParse = try diceParse
+                <|> try collParse
+                <|> try intExprParse
                 <|> try (parenParse collExprParse)
-                <|> try varParse
                 
 collExprParse :: Parser Expression
-collExprParse =  chainl1 collTermParse concatParse
+collExprParse =  chainl1 collTermParse binopCollParse
 
                
                 
@@ -228,9 +238,9 @@ negationParse  = do { reservedOp lis "¬"
                   ; return (NOT b) }
 
 comparisonParse :: Parser Expression
-comparisonParse  = do { x <- intExprParse
+comparisonParse  = do { x <- collExprParse
                     ; f <- compOpParse
-                    ; y <- intExprParse
+                    ; y <- collExprParse
                     ; return (f x y)}
 
 
@@ -240,19 +250,19 @@ boolParse  = chainl1 bTermParse boolOpParse
 bTermParse :: Parser Expression
 bTermParse  = negationParse
             <|> try boolPrimitive
+            <|> try comparisonParse
+            <|> try collExprParse
             <|> try (parenParse boolParse)
-            <|> comparisonParse
-            <|> try varParse
+            -- ~ <|> try varParse
 
 -------------------------------------
 --- General Expressions Parser ------
 -------------------------------------
 
 expParse :: Parser Expression
-expParse = try collExprParse 
-           <|> try boolParse 
-           <|> try intExprParse
-           <|> try varParse
+expParse = try boolParse 
+           -- ~ <|> try collExprParse 
+           -- ~ <|> try varParse
 
 
 -------------------------------------
@@ -330,11 +340,29 @@ commParse = chainr1 commLine dacParse
 -- Función de parseo
 ------------------------------------
 
+gandalf :: String
+
+
+gandalf = "\n\n  .   ^       \n" ++
+          "  | <###> |   \n" ++ 
+          "  |  #*#  |   \n" ++
+          "  :###`###:   \n" ++
+          "  |  ###      \n" ++
+          "  | #####     \n" ++
+          " _|_.___.__   \n" ++
+          "YOU SHALL NOT \n" ++
+          "    PARSE     \n\n"
+
 parseFile :: SourceName -> String -> ParseResult
-parseFile = parse (totParser commParse)
+parseFile sn st = case parse (totParser commParse) sn st of
+                     (Left e) -> Left $ addErrorMessage (Message gandalf) e
+                     c        -> c
 
 parseInt :: String -> ParseResult
-parseInt s = parse (totParser commParse) "" s
+parseInt s = case parse (totParser commParse) "" s of
+                (Left e) -> Left $ addErrorMessage (Message gandalf) e
+                c        -> c
+
 
   
 

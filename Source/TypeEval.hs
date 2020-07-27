@@ -34,7 +34,7 @@ typingBinaryOp t1 e1 t2 e2 optype = do
     actt1 <- typingExp e1
     equalType t1 actt1 (show e1) 
     actt2 <- typingExp e2
-    equalType t2 actt2 (show e1)
+    equalType t2 actt2 (show e2)
     return optype
 
 -- Checks if a unaryOp that expects type t1 has the actual type t1. 

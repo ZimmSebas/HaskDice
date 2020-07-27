@@ -26,9 +26,9 @@
 - ~I need to add the variables that already exists to the variable state~
 - ~Add the interactive mode~
 - ~Change the print of eval, now it prints the random number generator, let's try so that it doesn't. I can do it with declaring a type and a show instance.~
-- Need to change the Parser. Needs to be less strict so the TypeEval can solve the problems. (Sad D:)
+- ~Need to change the Parser. Needs to be less strict so the TypeEval can solve the problems.~ (Seems to work *fingercrossed*)
 - Make more Programs (Working on it)
-- Update the interactive mode (commands)
+- Update the interactive mode (just needs commands)
 - Add cabal package and command system
 - Change the language of AST.hs comments to english
 
@@ -96,15 +96,16 @@ It works :D
 
 ### To add, maybe.
 
+- Handle IOError
+- Add Skip command (no print) (allowing if then)
 - Should i have a possible If Then (without else)
 - Change the IfThenElse and Filter to use Booleans
-- Better parse errors
+- Better parse errors (more informative text)
 - Should i add function declaration?
 - Add Sort function (of collections)
 - Add Sort function (of variables)
-- Add Index function
+- Add Index function (of collections)
 - 1 dice as a number
 - ¿Add Print function (string)?
-- Add Skip command (no print) (allowing if then)
 - Add input choice
 - Change the State to only one state with variable and type

@@ -4,7 +4,7 @@
 module Main where
 
 import Control.Exception (catch,IOException)
-import System.IO.Error (catchIOError)
+import System.IO.Error 
 -- ~ import Control.Monad.Except
 import System.Console.Readline (readline)
 
@@ -12,7 +12,7 @@ import AST
 import TypeEval
 import RandomState
 import Eval
-import LeParser
+import LexerParser
 import Prelude
 import System.Environment
 import System.Random
@@ -47,7 +47,7 @@ iprompt :: String
 iprompt = "HkD> "
 
 ioExceptionCatcher :: IOException -> IO (Maybe a)
-ioExceptionCatcher _ = return Nothing
+ioExceptionCatcher e = if (isEOFError e) then do {print "Goodbye! See you soon!"; return Nothing} else do {print "IOError reached" ; return Nothing}
 
 
 data State = S { inter :: Bool,      -- True, if interactive mode
@@ -64,11 +64,11 @@ interactiveMode []        = do
         readevalprint g [] -- "infinite" loop with random number generator + empty state (no variables yet)
 
 readevalprint :: StdGen -> Env -> IO ()
-readevalprint g st = do maybeline <- catch (readline iprompt) ioExceptionCatcher
+readevalprint g st = do maybeline <- catchIOError (readline iprompt) ioExceptionCatcher
                         case maybeline of
-                             Nothing     -> print "Error reading something?"
+                             Nothing     -> print ""
                              Just ""     -> readevalprint g st
-                             Just "exit" -> print "Goodbye! Have fun!"
+                             Just "exit" -> print "Goodbye! See you soon!"
                              Just line   -> case (parseInt line) of
                                                  (Left e) -> do {print e; readevalprint g st}
                                                  (Right res) -> case eval g st res of 
