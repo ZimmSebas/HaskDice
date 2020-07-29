@@ -46,7 +46,7 @@ evalFiltOp (Equal n)  = (==n)
 evalFiltOp (NEqual n) = (/=n)
 
 -- evalExp takes any kind of expression and evaluates that expression, generating a Value.
-evalExp :: (MonadState m Value, MonadError m, MonadRandom m) => Expression -> m Value
+evalExp :: (MonadState m Value, MonadError m, MonadRandom m, MonadFail m) => Expression -> m Value
 evalExp (D k n) = do
     g' <- getStd
     let rolls = take k (randomRs (1 :: Int,n) g')
@@ -163,7 +163,7 @@ evalExp (NOT b) = do
 
 
 -- evalCommand takes a command and evaluates both the value and the changes in the state.
-evalCommand :: (MonadState m Value, MonadError m, MonadRandom m) => Command -> m Value
+evalCommand :: (MonadState m Value, MonadError m, MonadRandom m, MonadFail m) => Command -> m Value
 evalCommand (Expr exp) = do
             e <- evalExp exp
             return e

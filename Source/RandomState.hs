@@ -97,23 +97,21 @@ class Monad m => MonadError m where
     throwVarNotExist  :: String -> m a
     throwDivByZero    :: String -> String -> m a
     throwModByZero    :: String -> String -> m a
+    throwPatMatch     :: m a
 
 instance MonadError RandomState where
     throwTypingError t1 t2 s = RS (\st sg -> Crash $ TypingError t1 t2 s)
     throwVarNotExist v       = RS (\st sg -> Crash $ VarNotExist v)
     throwDivByZero e1 e2     = RS (\st sg -> Crash $ DivByZero e1 e2)
     throwModByZero e1 e2     = RS (\st sg -> Crash $ ModByZero e1 e2)
-
-    -- ~ throwTypingError t1 t2 s = RS (\st sg -> Nothing)
-    -- ~ throwVarNotExist v       = RS (\st sg -> Nothing)
-    -- ~ throwDivByZero e1 e2     = RS (\st sg -> Nothing)
-    -- ~ throwModByZero e1 e2     = RS (\st sg -> Nothing)
+    throwPatMatch            = RS (\st sg -> Crash PatternMatchError)
 
 instance MonadError TypeState where
     throwTypingError t1 t2 s = TS (\st -> Crash $ TypingError t1 t2 s)
     throwVarNotExist v       = TS (\st -> Crash $ VarNotExist v)
     throwDivByZero s1 s2     = TS (\st -> Crash $ DivByZero s1 s2)
     throwModByZero s1 s2     = TS (\st -> Crash $ ModByZero s1 s2)
+    throwPatMatch            = TS (\st -> Crash PatternMatchError)
 
 -- Class that represent monads that works with randomness
 class Monad m => MonadRandom m where
@@ -123,3 +121,9 @@ class Monad m => MonadRandom m where
 instance MonadRandom RandomState where
     getStd = RS (\st sg -> let (sg1,sg2) = split sg in
                            Return (sg1,st,sg2))
+
+instance MonadFail RandomState where
+    fail _ = throwPatMatch
+    
+instance MonadFail TypeState where
+    fail _ = throwPatMatch

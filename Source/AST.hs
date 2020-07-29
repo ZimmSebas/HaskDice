@@ -44,6 +44,7 @@ data Error = TypingError Type Type String
            | VarNotExist String 
            | DivByZero String String 
            | ModByZero String String
+           | PatternMatchError 
 
 instance Show Error where
     show (TypingError t1 t2 e) = "\n -- Error: Type error -- \nExpecting type: " ++
@@ -63,6 +64,7 @@ instance Show Error where
         show e1 ++
         " \nby: \n" ++
         show e2 ++ ".\n"
+    show (PatternMatchError) = "An error ocurred in the error pattern match, this should never happen. Contact the developer\n"
 
 -- The result of an evaluation (type or value)
 data Result a = Return a

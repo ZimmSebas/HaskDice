@@ -5,8 +5,9 @@ module Main where
 
 import Control.Exception (catch,IOException)
 import System.IO.Error 
--- ~ import Control.Monad.Except
 import System.Console.Readline (readline)
+import Data.List
+import Data.Char
 
 import AST
 import TypeEval
@@ -23,16 +24,20 @@ main = do
     case args of
         [] -> putStrLn "Error"
         ("-i":xs) -> interactiveMode xs
-        (name:xs) -> executeFile name
+        (name:xs) -> executeFile False [] name
 
-executeFile :: String -> IO ()
-executeFile name = do
+executeFile :: Bool -> Env -> String -> IO ()
+executeFile inter st name = do
     g <- newStdGen
     file <- readFile $ "../Programs/" ++ name
     case parseFile name file of
         Left error -> print error
-        Right t    -> do (print $ eval g [] t)
-
+        Right t    -> do case eval g [] t of 
+                              Crash er -> do print er  
+                                             if inter then readevalprint g st else print "\n Finished with error\n"
+                              Return reval@(ER (value, state, stdg)) -> do print reval 
+                                                                           if inter then readevalprint stdg state 
+                                                                                    else print "\n Finished sucessfully! \n"
 
 haskdicelogo :: IO ()
 haskdicelogo = do
@@ -49,13 +54,12 @@ iprompt = "HkD> "
 ioExceptionCatcher :: IOException -> IO (Maybe a)
 ioExceptionCatcher e = if (isEOFError e) then do {print "Goodbye! See you soon!"; return Nothing} else do {print "IOError reached" ; return Nothing}
 
-
-data State = S { inter :: Bool,      -- True, if interactive mode
-               lfile :: String,      -- Last file loaded (to "reload")
-               env :: Env,           -- Enviroment with variables and values  [Variable,Value]
-               stdg :: StdGen        -- Random number generator
-             }
-
+helpText :: String
+helpText = "\n Welcome to HaskDice! Commands available right now: \n\n" ++
+           "- :load / :l  <file> loads a file (must be in /prog) \n" ++
+           "- :quit / :q  Quits the interactive mode \n" ++
+           "- :help / :?  You are here so.. you know.. helps (?)\n" ++
+           "Have a pleasant day! \n\n"
 
 interactiveMode :: [String] -> IO ()
 interactiveMode []        = do
@@ -66,12 +70,21 @@ interactiveMode []        = do
 readevalprint :: StdGen -> Env -> IO ()
 readevalprint g st = do maybeline <- catchIOError (readline iprompt) ioExceptionCatcher
                         case maybeline of
-                             Nothing     -> print ""
-                             Just ""     -> readevalprint g st
-                             Just "exit" -> print "Goodbye! See you soon!"
-                             Just line   -> case (parseInt line) of
-                                                 (Left e) -> do {print e; readevalprint g st}
-                                                 (Right res) -> case eval g st res of 
-                                                                     Crash e                     -> do {print e ; readevalprint g st} 
-                                                                     Return reval@(ER (value, state, stdg)) -> do {print reval ; readevalprint stdg state}
-                                                
+                             Nothing      -> print ""
+                             Just ""      -> readevalprint g st
+                             Just ":q"    -> print "Goodbye! See you soon! :D"
+                             Just ":quit" -> print "Goodbye! See you soon! :D"
+                             Just ":help" -> do {putStr helpText ; readevalprint g st}
+                             Just ":?"    -> do {putStr helpText ; readevalprint g st}
+                             Just line    -> loadOrInter line g st
+
+loadOrInter :: String -> StdGen -> Env -> IO ()
+loadOrInter line g st = if isPrefixOf ":l" line then do let (_,t') =  break isSpace line
+                                                            t      =  dropWhile isSpace t'
+                                                        executeFile True st t
+                                                else case (parseInt line) of
+                                                          (Left e) -> do {print e; readevalprint g st}
+                                                          (Right res) -> case eval g st res of 
+                                                                              Crash e                     -> do {print e ; readevalprint g st} 
+                                                                              Return reval@(ER (value, state, stdg)) -> do {print reval ; readevalprint stdg state}
+                                                                              
