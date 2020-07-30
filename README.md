@@ -30,7 +30,7 @@ Once installed, you can use HaskDice tu run programs from console, for example:
 haskdice test.hkd
 ```
 
-Or you can call the interactive mode, using the flag "-i"
+Or you can call the interactive mode, using the flag -i
 
 ```
 haskdice -i
