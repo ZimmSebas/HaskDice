@@ -5,6 +5,7 @@ module RandomState where
 import AST
 import Control.Applicative (Applicative(..))
 import Control.Monad       (liftM, ap)
+import Control.Monad.Fail
 import Data.List
 import System.IO
 import System.Random 

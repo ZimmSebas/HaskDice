@@ -5,7 +5,7 @@ module Main where
 
 import Control.Exception (catch,IOException)
 import System.IO.Error 
-import System.Console.Readline (readline)
+import qualified System.Console.Readline (readline)
 import Data.List
 import Data.Char
 
@@ -29,7 +29,7 @@ main = do
 executeFile :: Bool -> Env -> String -> IO ()
 executeFile inter st name = do
     g <- newStdGen
-    file <- readFile $ "../Programs/" ++ name
+    file <- readFile $ "../prog/" ++ name
     case parseFile name file of
         Left error -> print error
         Right t    -> do case eval g [] t of 
@@ -68,12 +68,12 @@ interactiveMode []        = do
         readevalprint g [] -- "infinite" loop with random number generator + empty state (no variables yet)
 
 readevalprint :: StdGen -> Env -> IO ()
-readevalprint g st = do maybeline <- catchIOError (readline iprompt) ioExceptionCatcher
+readevalprint g st = do maybeline <- catchIOError (System.Console.Readline.readline iprompt) ioExceptionCatcher
                         case maybeline of
                              Nothing      -> print ""
                              Just ""      -> readevalprint g st
-                             Just ":q"    -> print "Goodbye! See you soon! :D"
-                             Just ":quit" -> print "Goodbye! See you soon! :D"
+                             Just ":q"    -> putStr "Goodbye! See you soon! :D"
+                             Just ":quit" -> putStr "Goodbye! See you soon! :D"
                              Just ":help" -> do {putStr helpText ; readevalprint g st}
                              Just ":?"    -> do {putStr helpText ; readevalprint g st}
                              Just line    -> loadOrInter line g st

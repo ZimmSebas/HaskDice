@@ -89,7 +89,7 @@ instance Show Type where
 
 
 
--- FilOp representa operadores de filter.
+-- FilOp are different operators that filter can have
 data FilOp = Grtth Int 
            | Lowth Int 
            | GrtEqt Int 
@@ -107,22 +107,15 @@ instance Show FilOp where
 
 
 
--- Expression representa operadores de colecciones.
--- Roll es un constructor sobre el tipo de datos Rolls
--- Least y Largt representan los N elementos más chicos/grandes (respectivamente).
--- Filter es la función filter con las operaciones permitidas.
--- Concat concatena dos resultados.
--- Const es una constante
--- Max y min calculan el mínimo de una colección
--- Sum y count suman los resultados de una colección o los cuentan, respectivamente.
-
--- DKN representa ...
--- Rolls representa tiradas de dados. 
--- D representa K tiradas de dados de N caras comenzando en 1 (kdn)
--- Z representa K tiradas de de dados de N caras comenzando en 0 (kZn)
--- C representa una tirada previamente evaluada (o sea, una colección)
---              K   N
-
+-- Expression represents operations with collections.
+-- D / Z make a kDn or kZn roll
+-- Least / Largt represents lower / greater  K elements of a collection.
+-- Filter can filter a collection with a FilOp
+-- Concat concats two collections
+-- Const is a constant
+-- Max y min calculates the minimum/maximum roll.
+-- Sum y count, calculates the sum or count the amount of rolls
+-- IsEmpty checks if the value is empty (No dice rolls in a collection, 0 if integer or True if boolean)
 data Expression where 
      D       :: Int -> Int -> Expression
      Z       :: Int -> Int -> Expression
@@ -192,6 +185,12 @@ instance Show Expression where
     show (IsEmpty v)    = "is empty " ++ show v      
  
 -- Commands
+-- Expr is any expression
+-- Let saves the value of an expression in a variable (if it doesn't exists, creates one).
+-- Seq is a sequence of commands
+-- If then else is.. that.
+-- Accum accummulates the results of the first command until the second is empty
+-- Repunt repeats the results of the first command until the second is not empty
 data Command where
     Expr       :: Expression -> Command
     Let        :: Variable -> Expression -> Command

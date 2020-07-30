@@ -27,10 +27,12 @@
 - ~Add the interactive mode~
 - ~Change the print of eval, now it prints the random number generator, let's try so that it doesn't. I can do it with declaring a type and a show instance.~
 - ~Need to change the Parser. Needs to be less strict so the TypeEval can solve the problems.~ (Seems to work *fingercrossed*)
-- Make more Programs (Working on it)
 - ~Update the interactive mode (just needs commands)~
+- ~Change the language of AST.hs comments to english~
+- ~Change to /prog~
+- Make more Programs (Working on it)
 - Add stack package and command system
-- Change the language of AST.hs comments to english
+- Add install instructions
 
 
 ## GADT idea (GADT branch) (Done, added to master branch. Then destroyed in Parsec branch)

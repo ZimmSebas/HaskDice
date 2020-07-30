@@ -8,6 +8,7 @@ import TypeEval
 import RandomState
 import Control.Applicative (Applicative(..))
 import Control.Monad       (liftM, ap)
+import Control.Monad.Fail
 import Data.List
 import System.IO
 import System.Random 
