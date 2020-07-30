@@ -29,15 +29,15 @@ main = do
 executeFile :: Bool -> Env -> String -> IO ()
 executeFile inter st name = do
     g <- newStdGen
-    file <- readFile $ "../prog/" ++ name
+    file <- readFile name
     case parseFile name file of
         Left error -> print error
         Right t    -> do case eval g [] t of 
                               Crash er -> do print er  
-                                             if inter then readevalprint g st else print "\n Finished with error\n"
+                                             if inter then readevalprint g st else putStr "\n Finished with error\n"
                               Return reval@(ER (value, state, stdg)) -> do print reval 
                                                                            if inter then readevalprint stdg state 
-                                                                                    else print "\n Finished sucessfully! \n"
+                                                                                    else putStr "\n Finished sucessfully! \n"
 
 haskdicelogo :: IO ()
 haskdicelogo = do
@@ -56,7 +56,7 @@ ioExceptionCatcher e = if (isEOFError e) then do {print "Goodbye! See you soon!"
 
 helpText :: String
 helpText = "\n Welcome to HaskDice! Commands available right now: \n\n" ++
-           "- :load / :l  <file> loads a file (must be in /prog) \n" ++
+           "- :load / :l  <file> loads a file \n" ++
            "- :quit / :q  Quits the interactive mode \n" ++
            "- :help / :?  You are here so.. you know.. helps (?)\n" ++
            "Have a pleasant day! \n\n"
@@ -70,10 +70,10 @@ interactiveMode []        = do
 readevalprint :: StdGen -> Env -> IO ()
 readevalprint g st = do maybeline <- catchIOError (System.Console.Readline.readline iprompt) ioExceptionCatcher
                         case maybeline of
-                             Nothing      -> print ""
+                             Nothing      -> putStr "Unexpected error\n"
                              Just ""      -> readevalprint g st
-                             Just ":q"    -> putStr "Goodbye! See you soon! :D"
-                             Just ":quit" -> putStr "Goodbye! See you soon! :D"
+                             Just ":q"    -> putStr "Goodbye! See you soon! :D\n"
+                             Just ":quit" -> putStr "Goodbye! See you soon! :D\n"
                              Just ":help" -> do {putStr helpText ; readevalprint g st}
                              Just ":?"    -> do {putStr helpText ; readevalprint g st}
                              Just line    -> loadOrInter line g st

@@ -27,12 +27,10 @@
 - ~Add the interactive mode~
 - ~Change the print of eval, now it prints the random number generator, let's try so that it doesn't. I can do it with declaring a type and a show instance.~
 - ~Need to change the Parser. Needs to be less strict so the TypeEval can solve the problems.~ (Seems to work *fingercrossed*)
-- ~Update the interactive mode (just needs commands)~
-- ~Change the language of AST.hs comments to english~
-- ~Change to /prog~
-- Make more Programs (Working on it)
-- Add stack package and command system
-- Add install instructions
+- ~Update the interactive mode (just needs commands)~ (Didn't add all, but it works :D)
+- ~Add stack package and command system~ (Yaaay)
+- ~Change the language of AST.hs comments to english~ 
+- ~Make more Programs~
 
 
 ## GADT idea (GADT branch) (Done, added to master branch. Then destroyed in Parsec branch)
@@ -75,11 +73,9 @@ It works! :D
 
 It works :D
 
-## Known errors
+## Known issues
 
-- ~I need to make a type system to the Filter Operations~ (Done)
-- ~The Parser is getting bugs from AlexPosn~ (Changed to Parsec library)
-- ~What happens if the numerical argument of least/largest exceeds the size?~ (Add to the inform, takes all the list)
+- There is an issue that sometimes when installing readline in stack, it fails. It's a stack issue so.. nothing i can do :(
 
 ### Questions and Researchs
 - ~Lists vs Multisets~ (Lists wins!)
@@ -98,7 +94,7 @@ It works :D
 
 ### To add, maybe.
 
-- Handle IOError
+- Handle IOError better
 - Add Skip command (no print) (allowing if then)
 - Should i have a possible If Then (without else)
 - Change the IfThenElse and Filter to use Booleans
