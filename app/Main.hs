@@ -34,10 +34,10 @@ executeFile inter st name = do
         Left error -> print error
         Right t    -> do case eval g [] t of 
                               Crash er -> do print er  
-                                             if inter then readevalprint g st else putStr "\n Finished with error\n"
+                                             if inter then readevalprint g st else putStr "Finished with error\n\n"
                               Return reval@(ER (value, state, stdg)) -> do print reval 
                                                                            if inter then readevalprint stdg state 
-                                                                                    else putStr "\n Finished sucessfully! \n"
+                                                                                    else putStr "Finished sucessfully!\n\n"
 
 haskdicelogo :: IO ()
 haskdicelogo = do
